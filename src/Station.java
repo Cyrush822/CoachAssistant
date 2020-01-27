@@ -62,7 +62,6 @@ public class Station implements Serializable {
 		this.numberOfTables = tables;
 		this.compType = compType;
 		players = new ArrayList<Player>();
-		removeAllAbsentPlayers();
 		saveTable();
 	}
 	
@@ -128,23 +127,6 @@ public class Station implements Serializable {
 	    	thisTable.delete();
 	    }
 	}
-	public boolean isFull() {
-		if(players.size() >= maxPlayers) {
-			return true;
-		}
-		return false;
-	}
-	public void removeAllAbsentPlayers() {
-		for(Player player : players) {
-			if(player.getIsAbsent()) {
-				players.remove(player);
-			}
-		}
-	}
-	public ArrayList<Player> getPlayersList() {
-		removeAllAbsentPlayers();
-		return players;
-	}
 	public void addPlayer(Player player) {
 		players.add(player);
 	}
@@ -153,9 +135,6 @@ public class Station implements Serializable {
 	}
 	public void deletePlayer(int index) {
 		players.remove(index);
-	}
-	public void deletePlayer(Player player) {
-		players.remove(players.indexOf(player));
 	}
 	public void addPlayer(Player player, int index) {
 		players.add(index, player);
@@ -261,6 +240,9 @@ public class Station implements Serializable {
 		return numberOfTables;
 	}
 
+	public ArrayList getPlayers() {
+		return players;
+	}
 
 	public void setStationName(String stationName) {
 		this.stationName = stationName;

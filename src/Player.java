@@ -1,8 +1,5 @@
 import java.io.File;
 import java.io.Serializable;
-
-import javax.swing.JOptionPane;
-
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 public class Player implements Serializable {
@@ -14,7 +11,6 @@ public class Player implements Serializable {
 	private float avgRank;
 	private Player partner;
 	
-	private boolean alreadyUsed;
 	/**
 	makes a new Player object, which stores all the information about one player.
 	@param String name, int rank, boolean isMale, boolean isAbsent
@@ -66,9 +62,6 @@ public class Player implements Serializable {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-	}
-	public String toString() {
-		return this.name;
 	}
 	/**
 	deletes the saved version of the player. 
@@ -123,12 +116,6 @@ public class Player implements Serializable {
 	}
 
 	public void setIsAbsent(boolean isAbsent) {
-		if(!isAbsent) {
-			if(alreadyUsed) {
-				JOptionPane.showMessageDialog(null, "This player is currently being used in a station!"
-						+ " as part of a special request! Please remove him first.");
-			}
-		}
 		this.isAbsent = isAbsent;
 		save();
 	}
@@ -160,11 +147,6 @@ public class Player implements Serializable {
 		this.isAbsent = isAbsent;
 		save();
 	}
-	public boolean isAlreadyUsed() {
-		return alreadyUsed;
-	}
-	public void setAlreadyUsed(boolean alreadyUsed) {
-		this.alreadyUsed = alreadyUsed;
-	}
+	
 	
 }

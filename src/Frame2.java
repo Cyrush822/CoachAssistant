@@ -1,5 +1,4 @@
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -69,7 +68,7 @@ public class Frame2 extends JFrame {
 	public Frame2(MasterPlayerList playerList) {
 		setTitle("Stations");
 		stationDirectory = new File(stationDirectoryName);
-		stationList = new MasterStationList(stationDirectory, playerList);
+		stationList = new MasterStationList(stationDirectory);
 		originalDirectory = new File(this.stationOrigDirectoryName);
 		this.playerList = playerList;
 		initComponents();
@@ -81,7 +80,6 @@ public class Frame2 extends JFrame {
 			btnTemp.setForeground(Color.green);
 		} 
 		updateList();
-		stationList.updatePlayerLists();
 		
 	}
 	
@@ -134,10 +132,8 @@ public class Frame2 extends JFrame {
 		});
 		btnNewButton.addActionListener(new ActionListener() {//sets absents
 			public void actionPerformed(ActionEvent e) {
-				if(JlistStations.getSelectedValue() != null) {
-					JlistStations.getSelectedValue().setDisabled(!JlistStations.getSelectedValue().isDisabled());
-					updateList();
-				}
+				JlistStations.getSelectedValue().setDisabled(!JlistStations.getSelectedValue().isDisabled());
+				updateList();
 			}
 		});
 		btnBack.addActionListener(new ActionListener() {
@@ -147,10 +143,8 @@ public class Frame2 extends JFrame {
 		});
 		btnInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(JlistStations.getSelectedValue() != null) {
-					StationInfo info = new StationInfo(JlistStations.getSelectedValue());
-					info.setVisible(true);
-				}
+				StationInfo info = new StationInfo(JlistStations.getSelectedValue());
+				info.setVisible(true);
 			}
 		});
 		btnDeleteAll.addActionListener(new ActionListener() {
@@ -163,18 +157,6 @@ public class Frame2 extends JFrame {
 				tempToggle();
 			}
 		});
-		
-		btnSpecRequest.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(JlistStations.getSelectedValue() != null) {
-					openSpecialRequest(JlistStations.getSelectedValue());
-				}
-			}
-		});
-	}
-	public void openSpecialRequest(Station selected) {
-		SpecialRequests request = new SpecialRequests(playerList, selected, stationList);
-		request.setVisible(true);
 	}
 	public void tempToggle() {
 		tempOn = !tempOn;
@@ -222,12 +204,10 @@ public class Frame2 extends JFrame {
 		}
 	}
 	public void deleteDir(File directory) {
-		if(directory.exists()) {
-			for(File file : directory.listFiles()) {
-				file.delete();
-			}
-			directory.delete();
+		for(File file : directory.listFiles()) {
+			file.delete();
 		}
+		directory.delete();
 	}
 	public void deleteAll() {
 		if((JOptionPane.showConfirmDialog(null, "ARE YOU ABSOLUTELY SURE YOU WANT TO DELETE ALL STATIONS?")) == JOptionPane.YES_OPTION); {
