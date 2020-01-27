@@ -36,6 +36,9 @@ import javax.swing.*;
 import javax.xml.*;
 public class MasterStationList implements Serializable{
 	ArrayList<Station> stations;
+	ArrayList<Player> availablePlayers;//players that are not absent
+	ArrayList<Player> usedPlayers;//players that are included per special request within all stations
+	MasterPlayerList playerList; //master player list included in constructor method.
 	File directory;
 	int lastTableNumber;
 	
@@ -50,7 +53,8 @@ public class MasterStationList implements Serializable{
 	}
 	
 	
-	public MasterStationList(File directory) {
+	public MasterStationList(File directory, MasterPlayerList playerList) {
+		this.playerList = playerList;
 		if(!directory.exists()) {
 			directory.mkdir();
 		}
@@ -61,6 +65,60 @@ public class MasterStationList implements Serializable{
 			stations.add(deserializeStation(allFiles[i]));
 			lastTableNumber++;
 		}
+		availablePlayers = new ArrayList<Player>();
+		usedPlayers = new ArrayList<Player>();
+		updatePlayerLists();
+	}
+	/**
+	 * Updates AvailablePlayers and UsedPlayers using MasterPlayerList
+	 */
+	public void updateAvailablePlayers() {
+		availablePlayers = playerList.getPlayerListWithoutAbsence();
+	}
+	public void updateUsedPlayers() {
+		while(usedPlayers.size() > 0) {
+			usedPlayers.remove(0);
+		}
+		for(Station station : stations) {
+			for(Player player : station.getPlayersList()) {
+				usedPlayers.add(player);
+			}
+		}
+	}
+	public void updatePlayerLists() {
+		updateAvailablePlayers();
+		updateUsedPlayers();
+	}
+	public void ensureAllStationsHaveValidPlayers() {
+		for(Station station : stations) {
+			for(Player player : station.getPlayersList()) {
+				if(!availablePlayers.contains(player)) {
+					station.deletePlayer(player);
+					if(usedPlayers.contains(player)) {
+						usedPlayers.remove(player); 
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * returns the list of candidates for special requests. 
+	 * namely, available players - used players.
+	 */
+	public ArrayList<Player> getAvailablePlayers() {
+		updatePlayerLists();
+		ArrayList<Player> suitable = availablePlayers;
+		for(Player player : usedPlayers) {
+			if(suitable.contains(player)) {
+				suitable.remove(player);
+			} else {
+				System.out.println("something seriously wrong happened "
+						+ "there's a player in used players but not available players? "
+						+ "did it get marked absent or deleted and didn't get removed "
+						+ "by the statino?");
+			}
+		}
+		return suitable;
 	}
 	/**
 	 * updates the list with the same directory

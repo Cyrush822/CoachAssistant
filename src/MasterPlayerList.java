@@ -249,7 +249,25 @@ public class MasterPlayerList implements Serializable{
 		sort();
 		return players;
 	}
+	public ArrayList<Player> getPlayerListWithoutAbsence() {
+		sort();
+		ArrayList<Player> newPlayers = new ArrayList<Player>();
+		for(Player player : players) {
+			if(!player.getIsAbsent())
+				newPlayers.add(player);
+		}
+		return newPlayers;
+	}
 	
+	public ArrayList<Player> getPlayerListWithoutAbsenceOrUsed() {//but what if it's being used and is absent???
+		sort();
+		ArrayList<Player> newPlayers = new ArrayList<Player>();
+		for(Player player : players) {
+			if(!player.getIsAbsent() && !player.isAlreadyUsed())
+				newPlayers.add(player);
+		}
+		return newPlayers;
+	}
 	/**
 	swaps two players in the list (not their actual rankings)
 	@param int firstRanking, int secondRanking.

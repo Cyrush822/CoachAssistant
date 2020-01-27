@@ -212,19 +212,6 @@ public class AddStation extends JDialog {
 				}
 				else {
 					checkBoxComp.setSelected(chckbxRequireEven.isSelected());
-//					boolean flag = checkBoxComp.isSelected();
-//					spinnerMin.setVisible(!flag);
-//					spinnerPref.setVisible(!flag);
-//					spinnerMax.setVisible(!flag);
-//					rdbtnDoubles.setVisible(flag);
-//					rdbtnSingles.setVisible(flag);
-//					lblMinimumNumberOf.setVisible(!flag);
-//					lblPreferredNumberOf.setVisible(!flag);
-//					lblMaximumNumberOf.setVisible(!flag);
-//					if(flag) {
-//						setAllPlayerSpinners(2);
-//						rdbtnSingles.setSelected(true);
-					
 				}
 				updateAllUIVisibilities();
 			}
@@ -233,15 +220,6 @@ public class AddStation extends JDialog {
 		checkBoxComp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updateAllUIVisibilities();
-//				boolean flag = checkBoxComp.isSelected();
-//				spinnerMin.setVisible(!flag);
-//				spinnerPref.setVisible(!flag);
-//				spinnerMax.setVisible(!flag);
-//				rdbtnDoubles.setVisible(flag);
-//				rdbtnSingles.setVisible(flag);
-//				lblMinimumNumberOf.setVisible(!flag);
-//				lblPreferredNumberOf.setVisible(!flag);
-//				lblMaximumNumberOf.setVisible(!flag);
 				boolean flag = checkBoxComp.isSelected();
 				if(flag) {
 					setAllPlayerSpinners(2);
