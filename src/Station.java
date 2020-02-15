@@ -85,7 +85,51 @@ public class Station implements Serializable {
             ex.printStackTrace();
         }
 	}
+	/**
+	 * returns importance of the RankPref.
+	 * 0 = allow
+	 * 1 = prioritize/avoid
+	 * 2 = strongly prioritize/ strongly avoid
+	 * 3 = restrict/require
+	 * @return
+	 */
+	public int getRankPreferenceImportance() {
+		if(rankPref.equals(MasterStationList.rankPreference.avoid) ||
+				rankPref.equals(MasterStationList.rankPreference.prioritize)) {
+			return 1;
+		} else if (rankPref.equals(MasterStationList.rankPreference.stronglyavoid) ||
+				rankPref.equals(MasterStationList.rankPreference.stronglyprioritize)) {
+			return 2;
+		} else if (rankPref.equals(MasterStationList.rankPreference.require) ||
+				rankPref.equals(MasterStationList.rankPreference.restrict)) {
+			return 3;
+		} else {
+			return 0;
+		}
+	}
 	
+	/**
+	 * returns importance of the GenderPref.
+	 * 0 = allow
+	 * 1 = prioritize/avoid
+	 * 2 = strongly prioritize/ strongly avoid
+	 * 3 = restrict/require
+	 * @return
+	 */
+	public int getGenderPrefImportance() {
+		if(genderPref.equals(MasterStationList.genderPreference.avoid) ||
+				genderPref.equals(MasterStationList.genderPreference.prioritize)) {
+			return 1;
+		} else if(genderPref.equals(MasterStationList.genderPreference.stronglyavoid) ||
+				genderPref.equals(MasterStationList.genderPreference.stronglyprioritize)) {
+			return 2;
+		} else if(genderPref.equals(MasterStationList.genderPreference.require) ||
+				genderPref.equals(MasterStationList.genderPreference.restrict)) {
+			return 3;
+		} else {
+			return 0;
+		}
+	}
 	public String toString() {
 		String str = "";
 		str += String.format("Name: %-20s | Desc: %-25s ", stationName, stationDescription);

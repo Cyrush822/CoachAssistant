@@ -44,7 +44,7 @@ public class StationInfo extends JDialog {
 			if(station.getCompType() == MasterStationList.competitiveType.doubles) {
 				lblPlayers.setText("Number Of Players: Doubles (4)");
 			} else {
-				lblPlayers.setText("Number Of Players: Singles (4)");
+				lblPlayers.setText("Number Of Players: Singles (2)");
 			}
 		}
 		lblMustBeEvens.setText("Must Be Evens: " + Boolean.toString(station.isMustBeEven()).toUpperCase());

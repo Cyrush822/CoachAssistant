@@ -1,39 +1,11 @@
-import java.awt.EventQueue;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 
-import javax.swing.JFrame;
-import java.awt.FlowLayout;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
-import java.awt.Font;
-import javax.swing.JButton;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JDesktopPane;
-import javax.swing.JDialog;
-import javax.swing.JToolBar;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.GridLayout;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
-import java.util.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.*;
-import javax.xml.*;
 /**
 Stores, organises, and performs operations on each Player Object.
 @param either an array of player, or the directory of serialized players
@@ -42,12 +14,14 @@ public class MasterPlayerList implements Serializable{
 	ArrayList<Player> players;
 	File directory;
 	int lastRank;
+	static int playerNumber;
 	public MasterPlayerList(Player[] players) {
 		this.players = new ArrayList<Player>();
 		for(int i = 0; i < players.length; i++) {
 			this.players.set(i, players[i]);
 			lastRank++;
 		}
+		playerNumber = this.getNumOfPlayers();
 	}
 	public MasterPlayerList(File directory) {
 		if(!directory.exists()) {
@@ -60,6 +34,7 @@ public class MasterPlayerList implements Serializable{
 			players.add(deserializePlayer(allFiles[i]));
 			lastRank++;
 		}
+		playerNumber = this.getNumOfPlayers();
 	}
 	
 	public int getNumOfPlayers() {
@@ -176,6 +151,7 @@ public class MasterPlayerList implements Serializable{
 	}
 	public void recalculateLastRank() {
 		lastRank = players.size();
+		playerNumber = this.getNumOfPlayers();
 	}
 	
 	public int getLastRank() {
@@ -249,7 +225,6 @@ public class MasterPlayerList implements Serializable{
 		sort();
 		return players;
 	}
-	
 	/**
 	swaps two players in the list (not their actual rankings)
 	@param int firstRanking, int secondRanking.

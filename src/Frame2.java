@@ -1,13 +1,10 @@
-import java.awt.EventQueue;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
 public class Frame2 extends JFrame {
 	private final String stationDirectoryName = "stations";
 	private final String stationOrigDirectoryName = "originalstations";
@@ -47,7 +43,6 @@ public class Frame2 extends JFrame {
 	private JButton btnNewButton;
 	private JButton btnBack;
 	private JButton btnNext;
-	private JButton btnSpecRequest;
 	private JButton btnInfo;
 	private JButton btnTemp;
 	private JButton btnDeleteAll;
@@ -132,8 +127,10 @@ public class Frame2 extends JFrame {
 		});
 		btnNewButton.addActionListener(new ActionListener() {//sets absents
 			public void actionPerformed(ActionEvent e) {
-				JlistStations.getSelectedValue().setDisabled(!JlistStations.getSelectedValue().isDisabled());
-				updateList();
+				if(JlistStations.getSelectedValue() != null) {
+					JlistStations.getSelectedValue().setDisabled(!JlistStations.getSelectedValue().isDisabled());
+					updateList();
+				}
 			}
 		});
 		btnBack.addActionListener(new ActionListener() {
@@ -143,8 +140,10 @@ public class Frame2 extends JFrame {
 		});
 		btnInfo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				StationInfo info = new StationInfo(JlistStations.getSelectedValue());
-				info.setVisible(true);
+				if(JlistStations.getSelectedValue() != null) {
+					StationInfo info = new StationInfo(JlistStations.getSelectedValue());
+					info.setVisible(true);
+				}
 			}
 		});
 		btnDeleteAll.addActionListener(new ActionListener() {
@@ -157,6 +156,28 @@ public class Frame2 extends JFrame {
 				tempToggle();
 			}
 		});
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				nextFrame();
+			}
+		});
+	}
+	public void nextFrame() {
+		if(playerList.getNumOfPlayers() > stationList.getNumberOfMaxPlayers()) {
+			JOptionPane.showMessageDialog(null, "Error! There are more players than "
+					+ " player slots within stations. Please add more slots in stations"
+					+ " or enable some of them.");
+			return;
+		}
+		if(playerList.getNumOfPlayers() < stationList.getNumberOfMinPlayers()) {
+			JOptionPane.showMessageDialog(null, "Error! There are too few players to satisfy "
+					+ "every player slot! Please disable some stations or double check the "
+					+ "number of players ");
+			return;
+		}
+		Frame3 frame3 = new Frame3(playerList, stationList);
+		frame3.setVisible(true);
+		this.setVisible(false);
 	}
 	public void tempToggle() {
 		tempOn = !tempOn;
@@ -210,7 +231,7 @@ public class Frame2 extends JFrame {
 		directory.delete();
 	}
 	public void deleteAll() {
-		if((JOptionPane.showConfirmDialog(null, "ARE YOU ABSOLUTELY SURE YOU WANT TO DELETE ALL STATIONS?")) == JOptionPane.YES_OPTION); {
+		if((JOptionPane.showConfirmDialog(null, "ARE YOU ABSOLUTELY SURE YOU WANT TO DELETE ALL STATIONS?")) == JOptionPane.YES_OPTION) {
 				stationList.deleteAll();
 				updateList();
 		}
@@ -243,13 +264,17 @@ public class Frame2 extends JFrame {
 		if(players > max) {
 			lblRequiredMax.setForeground(Color.red);
 		} else {
-			lblRequiredMax.setForeground(Color.black);
+			lblRequiredMax.setForeground(Color.green);
 		}
-		
+		if(players == stationList.getNumberOfPrefPlayers()) {
+			lblRequiredPref.setForeground(Color.green);
+		} else {
+			lblRequiredPref.setForeground(Color.black);
+		}
 		if(players < min) {
 			lblRequiredMin.setForeground(Color.red);
 		} else {
-			lblRequiredMin.setForeground(Color.black);
+			lblRequiredMin.setForeground(Color.green);
 		}
 	}
 	public void initComponents() {
@@ -273,8 +298,6 @@ public class Frame2 extends JFrame {
 		btnBack = new JButton("Back");
 		
 		btnInfo = new JButton("Show Info");
-		
-		btnSpecRequest = new JButton("Spec. Request");
 		
 		btnTemp = new JButton("Temp: Off");
 		
@@ -311,19 +334,6 @@ public class Frame2 extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(btnDeleteStation, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnEditStation)
-								.addComponent(btnNewStation)
-								.addComponent(btnInfo, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-									.addComponent(btnNewButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(btnSpecRequest, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE))
-								.addComponent(btnTemp))
-							.addPreferredGap(ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
-							.addContainerGap())
-						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(6)
 							.addComponent(lblTemp)
 							.addPreferredGap(ComponentPlacement.RELATED, 159, Short.MAX_VALUE)
@@ -331,25 +341,43 @@ public class Frame2 extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnNext)
 							.addGap(8))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(btnDeleteAll, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
-							.addComponent(lblNumberOfPresent)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblPresentPlayers)
-							.addGap(37)
-							.addComponent(lblNewLabel_2)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblRequiredMin, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblPref)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblRequiredPref, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblMax)
-							.addGap(4)
-							.addComponent(lblRequiredMax, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-							.addGap(7))))
+						.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+										.addComponent(btnDeleteStation, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
+										.addComponent(btnEditStation, Alignment.LEADING)
+										.addComponent(btnNewStation, Alignment.LEADING)
+										.addComponent(btnDeleteAll, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+										.addComponent(btnNewButton, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE))
+									.addGap(15))
+								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+										.addComponent(btnTemp, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
+										.addComponent(btnInfo, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
+									.addGap(18)))
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+									.addComponent(lblNumberOfPresent)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblPresentPlayers)
+									.addGap(37)
+									.addComponent(lblNewLabel_2)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblRequiredMin, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblPref)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblRequiredPref, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblMax)
+									.addGap(4)
+									.addComponent(lblRequiredMax, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
+									.addGap(7))
+								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+									.addContainerGap())))))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -365,14 +393,13 @@ public class Frame2 extends JFrame {
 							.addComponent(btnEditStation)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnDeleteStation)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addGap(18)
 							.addComponent(btnTemp)
-							.addPreferredGap(ComponentPlacement.RELATED)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addComponent(btnInfo)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnSpecRequest)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton)))
+							.addComponent(btnNewButton)
+							.addGap(23)))
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(11)

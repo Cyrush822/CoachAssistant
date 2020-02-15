@@ -38,6 +38,15 @@ public class Player implements Serializable {
 		this.partner = partner;
 	}
 	
+	public String toString() {
+		return this.name + "(" + this.rank + ")";
+	}
+	
+	public String genderToString(boolean isMale) {
+		if(isMale)
+			return "M";
+		return "F";
+	}
 	/**
 	saves this player. Deletes the old version and serializes the current version. 
 	Saves to a folder called "Player"
