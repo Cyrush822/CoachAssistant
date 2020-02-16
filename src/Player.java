@@ -1,5 +1,8 @@
 import java.io.File;
 import java.io.Serializable;
+
+import javax.swing.JOptionPane;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 public class Player implements Serializable {
@@ -10,7 +13,6 @@ public class Player implements Serializable {
 	private boolean isAbsent;
 	private float avgRank;
 	private Player partner;
-	
 	/**
 	makes a new Player object, which stores all the information about one player.
 	@param String name, int rank, boolean isMale, boolean isAbsent
@@ -69,6 +71,14 @@ public class Player implements Serializable {
             System.out.println("The Object was succesfully written to a file");
  
         } catch (Exception ex) {
+        	int option = JOptionPane.showConfirmDialog(null, "an error has occurred while loading a player"
+        			+ " (or perhaps all of them). This usually happens if there was an update "
+        			+ "or if a player file was corrupted. The only option is to try"
+        			+ "deleting all players, or contact Cyrus. Should the player folder be deleted?. ");
+        	if(option == 0) {
+        		File dir = new File(dirName);
+        		dir.delete();
+        	}
             ex.printStackTrace();
         }
 	}
@@ -140,6 +150,12 @@ public class Player implements Serializable {
 
 	public Player getPartner() {
 		return partner;
+	}
+	public boolean hasPartner() {
+		if(partner == null) {
+			return false;
+		}
+		return true;
 	}
 	public void deletePartner() {
 		partner = null;

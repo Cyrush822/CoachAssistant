@@ -255,7 +255,40 @@ public class FinalStationMasterList {
 		if(candidates.size() <= 0) {
 			return false;
 		}
-		int index = (int) (candidates.size() * Math.random());
+		int index = 99999;
+		int attempts = 0;
+		if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+			ArrayList<Player> existingPlayers = new ArrayList<Player>();
+			for(Player player : station.getCurrentPlayers()) {
+				existingPlayers.add(player);
+			}
+			for(Player player : existingPlayers) {
+				if(!station.getCurrentPlayers().contains(player.getPartner())) {
+					if(this.availablePlayers.contains(player.getPartner())) {
+						station.addPlayer(player.getPartner());
+					}
+				}
+			}
+		}
+		while(attempts < 50) {
+			index = (int) (candidates.size() * Math.random());
+			if(!station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+				break;
+			}
+			//is doubles
+			if(candidates.get(index).hasPartner()) {
+				if(station.getCurrentPlayers().size() >= 3) {
+					attempts++;
+					continue;
+				}
+				if(!this.availablePlayers.contains(candidates.get(index).getPartner())) {
+					attempts++;
+					continue;
+				}
+				station.addPlayer(candidates.get(index).getPartner());
+				break;
+			}
+		}
 		station.addPlayer(candidates.get(index));
 		return true;
 	}
