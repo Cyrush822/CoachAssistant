@@ -24,11 +24,11 @@ import java.awt.event.FocusEvent;
 public class EditPlayerBox extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JTextField txtIndex;
 	private JTextField txtName;
 	private JButton btnOK;
 	private JComboBox cbGender;
 	private MasterPlayerList playerList;
+	private Player selected;
 	Frame1 Frame;
 	enum gender
 	{
@@ -47,22 +47,20 @@ public class EditPlayerBox extends JDialog {
 //	} catch (Exception e) {
 //		e.printStackTrace();
 //	}
-	public EditPlayerBox(MasterPlayerList playerList, Frame1 F1) {
+	public EditPlayerBox(MasterPlayerList playerList, Player selected, Frame1 F1) {
 		this.playerList = playerList;
 		Frame = F1;
+		this.selected = selected;
 		setTitle("Edit Player");
 		setResizable(false);
 		setModal(true);
 		setAlwaysOnTop(true);
-		setBounds(100, 100, 450, 175);
+		setBounds(100, 100, 450, 140);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
 		JLabel lblEditPlayer = new JLabel("Edit Existing Player");
-		
-		txtIndex = new JTextField();
-		txtIndex.setColumns(10);
 		
 		JLabel lblName = new JLabel("New name");
 		
@@ -85,9 +83,6 @@ public class EditPlayerBox extends JDialog {
 		});
 		txtName.setColumns(10);
 		
-		JLabel lblIndex = new JLabel("Ranking");
-		lblIndex.setHorizontalAlignment(SwingConstants.TRAILING);
-		
 		JLabel lblGender = new JLabel("Gender");
 		lblGender.setHorizontalAlignment(SwingConstants.TRAILING);
 		
@@ -101,6 +96,9 @@ public class EditPlayerBox extends JDialog {
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGap(153)
+							.addComponent(lblEditPlayer))
+						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(lblName)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -108,32 +106,20 @@ public class EditPlayerBox extends JDialog {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblGender, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(cbGender, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblIndex, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(txtIndex, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(153)
-							.addComponent(lblEditPlayer)))
-					.addContainerGap(28, Short.MAX_VALUE))
+							.addComponent(cbGender, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(26, Short.MAX_VALUE))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addComponent(lblEditPlayer)
-					.addGap(16)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblIndex)
-						.addComponent(txtIndex, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(14)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblName)
 						.addComponent(txtName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblGender)
 						.addComponent(cbGender, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(14, Short.MAX_VALUE))
+					.addContainerGap(48, Short.MAX_VALUE))
 		);
 		contentPanel.setLayout(gl_contentPanel);
 		{
@@ -146,22 +132,11 @@ public class EditPlayerBox extends JDialog {
 					public void actionPerformed(ActionEvent e) {
 						while(true)
 						{
-							int ranking;
-							try {
-								ranking = Integer.parseInt(txtIndex.getText());
-							} 
-							catch(Exception a){
-								JOptionPane.showMessageDialog(null, "ERROR! Please input a number");
-								break;
-							}
-							if(playerList.getLastRank() < ranking || ranking < 1) {
-								JOptionPane.showMessageDialog(null, "ERROR! Please input a valid rank.");
+							if(txtName.getText().isEmpty()) {
+								JOptionPane.showMessageDialog(null, "Please input a name.");
 								return;
 							}
-							if(!playerList.isNameOk(txtName.getText(), ranking)) {
-								return;
-							}
-							Frame.editPlayer(ranking, txtName.getText(), cbGender.getSelectedIndex() == 0);
+							Frame.editPlayer(selected, txtName.getText(), cbGender.getSelectedIndex() == 0);
 							setVisible(false);
 							break;
 						}

@@ -90,10 +90,10 @@ public class Frame1 {
 		updatePlayerLabels();
 	}
 
-	public void editPlayer(int ranking, String name, boolean isMale) {
-
-		Player player = new Player(name, ranking, isMale, false);
-		playerList.editPlayer(ranking, player);
+	public void editPlayer(Player player, String name, boolean isMale) {
+		//Player player = new Player(name, ranking, isMale, false);
+		playerList.editPlayer(player, name, isMale);
+		//playerList.editPlayer(ranking, player);
 		updatePlayerLabels();
 	}
 	/**
@@ -101,8 +101,18 @@ public class Frame1 {
 	 * Call after every change to player information.
 	 */
 
-	public void deletePlayer(int ranking) {
-		playerList.deletePlayer(ranking);
+	public void deletePlayer() {
+		PlayerLabel selected = getOneSelectedPlayerLabel();
+		if(selected == null) {
+			return;
+		}
+		int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this player? "
+				+ "If he has a partner, it will be unassigned and his average ranking will"
+				+ "be gone forever!");
+		if(option != 0) {
+			return;
+		}
+		playerList.deletePlayer(selected.rank);
 		updatePlayerLabels();
 	}
 	public void updatePlayerLabels() {
@@ -262,7 +272,10 @@ public class Frame1 {
 		});
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				openDeletePlayerBox();
+				deletePlayer();
+				for(PlayerLabel label : labelList.getPlayerLabelList()) {
+					label.setIsSelected(false);
+				}
 			}
 		});
 		btnSwap.addActionListener(new ActionListener() {
@@ -295,6 +308,20 @@ public class Frame1 {
 	}
 	
 	public void openAdvancedPlayerBox() {
+		PlayerLabel selected = getOneSelectedPlayerLabel();
+		if(selected == null) {
+			return;
+		}
+		try {
+			AdvancedPlayerBox dialog = new AdvancedPlayerBox(selected.getPlayer(), playerList);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+			selected.setIsSelected(false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public PlayerLabel getOneSelectedPlayerLabel() {
 		int numberOfSelected = 0;
 		PlayerLabel selected = null;
 		for(PlayerLabel PL : labelList.getPlayerLabelList()) {
@@ -305,16 +332,9 @@ public class Frame1 {
 		}
 		if(numberOfSelected != 1) {
 			JOptionPane.showMessageDialog(null, "Please select one and only one player!");
-			return;
-		} 
-		try {
-			AdvancedPlayerBox dialog = new AdvancedPlayerBox(selected.getPlayer(), playerList);
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-			selected.setIsSelected(false);
-		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
+		return selected;
 	}
 	/**
 	 * opens up the add player box and initializes it with necessary information. 
@@ -333,7 +353,11 @@ public class Frame1 {
 	 */
 	public void openEditPlayerBox() {
 		try {
-			EditPlayerBox dialog = new EditPlayerBox(playerList, this);
+			PlayerLabel selected = getOneSelectedPlayerLabel();
+			if(selected == null) {
+				return;
+			}
+			EditPlayerBox dialog = new EditPlayerBox(playerList, selected.getPlayer(), this);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception a) {

@@ -105,7 +105,7 @@ public class DeletePlayerBox extends JDialog {
 								JOptionPane.showMessageDialog(null, "ERROR! Please input a valid rank");
 								return;
 							}
-							Frame.deletePlayer(ranking);
+							//Frame.deletePlayer(ranking);
 							setVisible(false);
 							return;
 					}

@@ -93,15 +93,16 @@ public class MasterPlayerList implements Serializable{
 	 * @param ranking
 	 * @param newPlayer
 	 */
-	public void editPlayer(int ranking, Player newPlayer) {
+	
+	public void editPlayer(Player player, String newName, boolean newIsMale) {
 		sort();
-		Player playerToRemove = players.get(ranking - 1);
-		boolean isAbsent = playerToRemove.getIsAbsent();
-		deletePlayer(ranking);
-		newPlayer.setAbsent(isAbsent);
-		addPlayer(newPlayer, ranking - 1);//should add player to that particular index. 
+		if (player.getPartner() != null) {
+			player.getPartner().save();
+		}
+		player.setName(newName);
+		player.setIsMale(newIsMale);
 		recalculateLastRank();
-		newPlayer.save();
+		player.save();
 		sort();
 		updateRanks();
 	}
@@ -117,6 +118,10 @@ public class MasterPlayerList implements Serializable{
 	*/
 	public void deletePlayer(int ranking){
 		sort();
+		if(players.get(ranking - 1).getPartner() != null) {
+			players.get(ranking - 1).getPartner().deletePartner();
+			players.get(ranking - 1).getPartner().save();
+		}
 		players.get(ranking - 1).delete();
 		players.remove(ranking - 1);
 		updateRanks();
