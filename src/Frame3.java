@@ -55,7 +55,8 @@ public class Frame3 extends JFrame {
 		this.stationList = stationList;
 		finalStationList = new FinalStationMasterList(playerList);
 		for(int i = 0; i < stationList.getStations().size(); i++) {
-			finalStationList.addStation(new FinalStation(stationList.getStations().get(i), playerList, finalStationList));
+			if(!stationList.getStations().get(i).isDisabled())
+				finalStationList.addStation(new FinalStation(stationList.getStations().get(i), playerList, finalStationList));
 		}
 		System.out.println(finalStationList.getAvailablePlayers());
 		updateFinalStationList();

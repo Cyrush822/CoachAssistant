@@ -84,7 +84,7 @@ public class MasterStationList implements Serializable{
 		for(File file : directory.listFiles()) {
 			file.delete();
 		}
-		directory.delete();
+//		directory.delete();
 		stations = new ArrayList<Station>();
 	}
 	public ArrayList<Station> getStations() {

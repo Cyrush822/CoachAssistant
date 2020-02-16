@@ -99,29 +99,29 @@ public class FinalStationMasterList {
 					break;
 				}
 			}
-//			if(allStationsAreAtMin()) {
-//				if(this.getAvailablePlayers().size() > 0) {
-//					if(!useUpRemainingCandidates()) {
-//						attempts++;
-//						continue;
-//					} else {
-//						break;
-//					}
-//				} 
-//			} else {
-//				attempts++;
-//			}
-			if(allStationsAreAtMin()) {
-				break;
+			if(allStationsAreAtMin()) {//false = failed to fill each station to minimum number of players
+				if(this.getAvailablePlayers().size() > 0) {
+					boolean successful = useUpRemainingCandidates();
+					if(successful) {
+						break;
+					} else {
+						attempts++;
+						continue;
+					}
+				} else {
+					break;	
+				}
+			} else {
+				attempts++;
+				continue;
 			}
-			attempts++;
 		}
 		
-//		if(this.getAvailablePlayers().size() > 0) {
-//			JOptionPane.showMessageDialog(null, "There was an error likely due to too many parameters! "
-//					+ "Please try again. If that doesn't work, "
-//					+ "try decreasing the number of conditions and parameters!", "error", 0);
-//		}
+		if(this.getAvailablePlayers().size() > 0) {
+			JOptionPane.showMessageDialog(null, "There was an error likely due to too many parameters! "
+					+ "Please try again. If that doesn't work, "
+					+ "try decreasing the number of conditions and parameters!", "error", 0);
+		}
 	}
 	private boolean useUpRemainingCandidates() {
 		for(int i = 0; i < this.availablePlayers.size(); i++) {//try to fit one where it is preferred
@@ -132,6 +132,7 @@ public class FinalStationMasterList {
 					if(!station.satisfiedPreferredNumberOfPlayers() && station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {
 						station.addPlayer(this.availablePlayers.get(i));
 						success = true;
+						break;
 					}
 				}
 				if(!success) {
@@ -146,9 +147,10 @@ public class FinalStationMasterList {
 				success = false;
 				while(listNumber < finalStations.get(0).getCandidateLists().size()) {
 					for(FinalStation station : finalStations) {
-						if(!station.isFull() && station.getCandidateLists().get(listNumber).contains(this.getAvailablePlayers())) {
+						if(!station.isFull() && station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {
 							station.addPlayer(this.availablePlayers.get(i));
 							success = true;
+							break;
 						}
 					}
 					if(!success) {
@@ -162,6 +164,9 @@ public class FinalStationMasterList {
 			if(!success) {
 				return false;
 			}
+		}
+		if(this.getAvailablePlayers().size() > 0) {
+			return false;
 		}
 		return true;
 	}
@@ -190,7 +195,7 @@ public class FinalStationMasterList {
 			return true;
 		}
 		int attempts = 0;
-		while(attempts < Math.pow(station.getStation().getMinPlayers(), 2) ) {
+		while(attempts < Math.pow(station.getStation().getMinPlayers(), 3) ) {
 			ArrayList<Player> targetList = new ArrayList<Player>();
 			station.calculateLists();
 			for(int i = 0; i < station.getCandidateLists().size(); i++) {

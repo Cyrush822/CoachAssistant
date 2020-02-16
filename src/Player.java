@@ -141,7 +141,10 @@ public class Player implements Serializable {
 	public Player getPartner() {
 		return partner;
 	}
-
+	public void deletePartner() {
+		partner = null;
+		save();
+	}
 	public void setPartner(Player partner) {
 		this.partner = partner;
 		save();

@@ -137,6 +137,9 @@ public class PlayerLabel {
 	public boolean getIsSelected() {
 		return button.isSelected();
 	}
+	public void setIsSelected(boolean selected) {
+		button.setSelected(selected);
+	}
 	public Player getPlayer() {
 		return player;
 	}
