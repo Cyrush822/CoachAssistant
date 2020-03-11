@@ -15,6 +15,7 @@ public class MasterPlayerList implements Serializable{
 	File directory;
 	int lastRank;
 	static int playerNumber;
+
 	public MasterPlayerList(Player[] players) {
 		this.players = new ArrayList<Player>();
 		for(int i = 0; i < players.length; i++) {
@@ -36,7 +37,23 @@ public class MasterPlayerList implements Serializable{
 		}
 		playerNumber = this.getNumOfPlayers();
 	}
-	
+	public int generatePlayerID() {
+		int number = 10;
+		while(true) {
+			number = (int) (Math.random() * Integer.MAX_VALUE);
+			boolean repeat = false;
+			for(Player player : players) {
+				if(number == player.getPlayerID()) {
+					repeat = true;
+				}
+			}
+			if(repeat) {
+				continue;
+			}
+			break;
+		}
+		return number;
+	}
 	public int getNumOfPlayers() {
 		int num = 0;
 		for(Player player : players) {
@@ -229,6 +246,16 @@ public class MasterPlayerList implements Serializable{
 	public ArrayList<Player> getPlayerList() {
 		sort();
 		return players;
+	}
+	public ArrayList<Player> getPresentPlayerList() {
+		sort();
+		ArrayList<Player> nonAbsentPlayers = new ArrayList<Player>();
+		for(Player  p : players) {
+			if(!p.getIsAbsent()) {
+				nonAbsentPlayers.add(p);
+			}
+		}
+		return nonAbsentPlayers;
 	}
 	/**
 	swaps two players in the list (not their actual rankings)

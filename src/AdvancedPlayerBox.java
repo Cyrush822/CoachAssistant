@@ -29,6 +29,7 @@ public class AdvancedPlayerBox extends JDialog {
 	private JLabel lblPartner;
 	private JButton btnSet;
 	private JButton btnunset;
+	private JLabel lblPlayerid;
 	
 	/**
 	 * Launch the application.
@@ -47,8 +48,11 @@ public class AdvancedPlayerBox extends JDialog {
 	 * Create the dialog.
 	 */
 	public AdvancedPlayerBox(Player target, MasterPlayerList playerList) {
+		setModal(true);
 		initComponents();
 		createEvents();
+		this.setTitle("advanced settings: " + target.getName());
+		this.lblPlayerid.setText("PlayerID: " + target.getPlayerID());
 		this.player = target;
 		this.partneredPlayer = new PartneredPlayer(target);
 		this.playerList = playerList;
@@ -83,7 +87,6 @@ public class AdvancedPlayerBox extends JDialog {
 		
 		for(Player player : playerList.getPlayerList()) {
 			if(target.getPartner() != null) {
-
 				if(target.getPartner().equals(player)) {
 					System.out.println("true: " + target.getPartner().getName());
 				} else {
@@ -116,6 +119,8 @@ public class AdvancedPlayerBox extends JDialog {
 		this.partneredPlayer.setPartner(newPartner.getPlayer());
 		newPartner.setPartner(this.partneredPlayer.getPlayer());
 		this.lblPartner.setText(newPartner.getPlayer().getName());
+		this.partneredPlayer.getPlayer().save();
+		newPartner.getPlayer().save();
 		updatePartneredPlayers();
 		updatePartnerList();
 	}
@@ -181,7 +186,7 @@ public class AdvancedPlayerBox extends JDialog {
 		
 	}
 	void initComponents() {
-		setBounds(100, 100, 450, 230);
+		setBounds(100, 100, 450, 250);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -202,37 +207,39 @@ public class AdvancedPlayerBox extends JDialog {
 		JLabel lblAverageRanking = new JLabel("Average Ranking:");
 		
 		JLabel label = new JLabel("00.00");
+		
+		lblPlayerid = new JLabel("PlayerID: 000000000000000000000");
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
-			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(47)
-							.addComponent(lblCurrentPartner)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(lblSetDoublesPartner)
-							.addGap(18))
-						.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblPartner, GroupLayout.PREFERRED_SIZE, 172, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+							.addGroup(gl_contentPanel.createSequentialGroup()
+								.addGap(47)
+								.addComponent(lblCurrentPartner)
+								.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblSetDoublesPartner)
+								.addGap(18))
+							.addGroup(gl_contentPanel.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+									.addGroup(gl_contentPanel.createSequentialGroup()
+										.addComponent(lblPartner, GroupLayout.PREFERRED_SIZE, 172, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(btnSet))
 									.addComponent(btnunset, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnSet)))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblAverageRanking)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)))
-					.addGap(148))
-				.addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblAverageRanking)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(label, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(352, Short.MAX_VALUE))
+							.addComponent(label, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblPlayerid)))
+					.addContainerGap(6, Short.MAX_VALUE))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -244,13 +251,13 @@ public class AdvancedPlayerBox extends JDialog {
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addGap(12)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-									.addComponent(btnSet)
-									.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addGroup(gl_contentPanel.createSequentialGroup()
+									.addComponent(btnSet)
+									.addPreferredGap(ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
 									.addComponent(btnunset)
-									.addPreferredGap(ComponentPlacement.RELATED))))
+									.addGap(1))
+								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addGap(37)
 							.addComponent(lblPartner)))
@@ -258,7 +265,9 @@ public class AdvancedPlayerBox extends JDialog {
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblAverageRanking)
 						.addComponent(label))
-					.addGap(78))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblPlayerid)
+					.addGap(56))
 		);
 		
 		partneredPlayersList = new JList();

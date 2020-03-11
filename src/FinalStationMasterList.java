@@ -22,7 +22,7 @@ public class FinalStationMasterList {
 //	}
 	public FinalStationMasterList(MasterPlayerList playerList) {
 		finalStations = new ArrayList<FinalStation>();
-		players = playerList.getPlayerList();
+		players = playerList.getPresentPlayerList();
 		availablePlayers = new ArrayList<Player>();
 		this.playerList = playerList;
 	}
@@ -30,7 +30,7 @@ public class FinalStationMasterList {
 	public FinalStationMasterList(File directory, MasterPlayerList playerList) {
 		this.dir = directory;
 		this.playerList = playerList;
-		players = playerList.getPlayerList();
+		players = playerList.getPresentPlayerList();
 		availablePlayers = new ArrayList<Player>();
 		if (!dir.exists()) {
 			dir.mkdir();
@@ -87,7 +87,7 @@ public class FinalStationMasterList {
 	public void generateStations() {
 		int attempts = 0;
 		
-		while(attempts < Math.pow(finalStations.size(), 3)) {
+		while(attempts < Math.pow(finalStations.size(), 2)) {
 			for(FinalStation station : finalStations) {
 				station.clearPlayers();
 				station.calculatePriority();
@@ -209,11 +209,28 @@ public class FinalStationMasterList {
 				station.clearPlayers();
 				continue;
 			} else {
-				addRandomCandidate(station, targetList);
+				if(!station.satisfiedMinimum()) {
+					addRandomCandidate(station, targetList);
+				}
 				if(station.satisfiedMinimum()) {
 					break;
 				} else {
-					continue;
+					if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+						ArrayList<Player> existingPlayers = new ArrayList<Player>();
+						for(Player player : station.getCurrentPlayers()) {
+							existingPlayers.add(player);
+						}
+						for(Player player : existingPlayers) {
+							if(!station.getCurrentPlayers().contains(player.getPartner())) {
+								if(this.availablePlayers.contains(player.getPartner()) && station.getCurrentPlayers().size() <= 3) {
+									station.addPlayer(player.getPartner());
+									updateAvailablePlayers();
+								}
+							}
+						}
+						attempts++;
+						continue;
+					}
 				}
 			}
 		}
@@ -257,21 +274,26 @@ public class FinalStationMasterList {
 		}
 		int index = 99999;
 		int attempts = 0;
-		if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
-			ArrayList<Player> existingPlayers = new ArrayList<Player>();
-			for(Player player : station.getCurrentPlayers()) {
-				existingPlayers.add(player);
-			}
-			for(Player player : existingPlayers) {
-				if(!station.getCurrentPlayers().contains(player.getPartner())) {
-					if(this.availablePlayers.contains(player.getPartner())) {
-						station.addPlayer(player.getPartner());
-					}
-				}
-			}
-		}
+//		if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+////			ArrayList<Player> existingPlayers = new ArrayList<Player>();
+////			for(Player player : station.getCurrentPlayers()) {
+////				existingPlayers.add(player);
+////			}
+////			for(Player player : existingPlayers) {
+////				if(!station.getCurrentPlayers().contains(player.getPartner())) {
+////					if(this.availablePlayers.contains(player.getPartner()) && station.getCurrentPlayers().size() <= 3) {
+////						station.addPlayer(player.getPartner());
+////						updateAvailablePlayers();
+////					}
+////				}
+////			}
+//		}
 		while(attempts < 50) {
 			index = (int) (candidates.size() * Math.random());
+			if(!availablePlayers.contains(candidates.get(index))) {
+				attempts++;
+				continue;
+			}
 			if(!station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
 				break;
 			}
@@ -287,7 +309,12 @@ public class FinalStationMasterList {
 				}
 				station.addPlayer(candidates.get(index).getPartner());
 				break;
+			} else {
+				break;
 			}
+		}
+		if(attempts >= 50) {
+			return false;
 		}
 		station.addPlayer(candidates.get(index));
 		return true;

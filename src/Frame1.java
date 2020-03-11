@@ -64,6 +64,9 @@ public class Frame1 {
 		createEvents();
 		assignLists();
 		recreatePartnerConnections();
+		for(int i = 0; i < 5; i++) {
+			System.out.println(playerList.generatePlayerID());
+		}
 	}
 	/**
 	 * initializes playerList and labelList. 
@@ -84,7 +87,7 @@ public class Frame1 {
 	 */
 	public void addPlayer(String name, boolean isMale) {
 		int rank = playerList.getLastRank() + 1;
-		Player player = new Player(name, rank, isMale, false);
+		Player player = new Player(name, rank, isMale, false, playerList.generatePlayerID());
 		player.save();
 		playerList.addPlayer(player);
 		updatePlayerLabels();
@@ -156,6 +159,15 @@ public class Frame1 {
 		btnNext.setForeground(Color.BLUE);
 		
 		btnAdvanced = new JButton("Advanced");
+		
+		JButton btnHelp = new JButton("Help");
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Frame1Help newFrame = new Frame1Help();
+				newFrame.setVisible(true);
+				}
+			
+		});
 		GroupLayout groupLayout = new GroupLayout(getFrmCissTableTennis().getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -179,18 +191,23 @@ public class Frame1 {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnAbsent, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(53)
+							.addGap(55)
 							.addComponent(btnAdvanced)))
-					.addPreferredGap(ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnNext)
+					.addPreferredGap(ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnHelp, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNext, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(6)
 							.addComponent(btnDelete, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnEdit, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnAdd, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+					.addGap(12))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -214,7 +231,9 @@ public class Frame1 {
 							.addComponent(btnAbsent)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnNext)
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btnHelp)
+							.addComponent(btnNext))
 						.addComponent(btnAdvanced))
 					.addGap(30))
 		);
@@ -236,7 +255,8 @@ public class Frame1 {
 			if(player.getPartner()!= null) {
 				boolean set = false;
 				for(Player comparedPlayer: playerList.getPlayerList()) {
-					if(player.getPartner().getName().equals(comparedPlayer.getName())) {
+					if(player.getPartner().getPlayerID() == comparedPlayer.getPlayerID()) {
+//					if(player.getPartner().getName().equals(comparedPlayer.getName())) {
 						if(set) {
 							System.out.println("ERROR ERROR two valid players fit the "
 									+ "deserialized version of partner");

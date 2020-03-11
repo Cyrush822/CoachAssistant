@@ -51,6 +51,15 @@ public class EditPlayerBox extends JDialog {
 		this.playerList = playerList;
 		Frame = F1;
 		this.selected = selected;
+		initComponent(playerList, selected);
+		txtName.setText(selected.getName());
+		if(selected.getIsMale()) {
+			cbGender.setSelectedItem(gender.male);
+		} else {
+			cbGender.setSelectedItem(gender.female);;
+		}
+	}
+	private void initComponent(MasterPlayerList playerList, Player selected) {
 		setTitle("Edit Player");
 		setResizable(false);
 		setModal(true);
@@ -134,6 +143,9 @@ public class EditPlayerBox extends JDialog {
 						{
 							if(txtName.getText().isEmpty()) {
 								JOptionPane.showMessageDialog(null, "Please input a name.");
+								return;
+							}
+							if(!playerList.isNameOk(txtName.getText(), selected.getRank())) {
 								return;
 							}
 							Frame.editPlayer(selected, txtName.getText(), cbGender.getSelectedIndex() == 0);

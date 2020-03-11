@@ -157,7 +157,7 @@ public class MasterStationList implements Serializable{
 			return false;
 		} 
 		if(name.contains("/")) {
-			JOptionPane.showMessageDialog(null, "Please do not use /, as it will crash the program.");
+			JOptionPane.showMessageDialog(null, "Please do not use /, as it will upset the program.");
 			return false;
 		}
 		for(Station station : stations) {

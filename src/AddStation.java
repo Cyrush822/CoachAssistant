@@ -63,6 +63,7 @@ public class AddStation extends JDialog {
 	private JLabel lblPreferredNumberOf;
 	private JLabel lblMaximumNumberOf;
 	private JLabel lblRankPref;
+	private JButton btnHelp;
 	public enum rankingPref {
 	};
 	/**
@@ -426,9 +427,7 @@ public class AddStation extends JDialog {
 		}
 		return true;
 	}
-	void initComponents() { 
-
-		setModal(true);
+	void initComponents() {
 		setTitle("Add New Station");
 		setBounds(100, 100, 475, 375);
 		getContentPane().setLayout(new BorderLayout());
@@ -436,7 +435,7 @@ public class AddStation extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		JLabel lblStationName = new JLabel("Station name:");
 		lblStationName.setToolTipText("name of the station for refernece");
-		JLabel lblStationDescription = new JLabel("Station description:");
+		JLabel lblStationDescription = new JLabel("Station tag:");
 		lblStationDescription.setToolTipText("<HTML>\nA short description of the station. <br>\nTables with the EXACT same description are treated as the same and will avoid repeating players<br>\n(e.g. 3 singles tables all with the desc. \"singles\" will all try to prevent having the same <br> player in each of the stations 2 weeks in a row.)");
 		lblMinimumNumberOf = new JLabel("Minimum number of players:");
 		lblMinimumNumberOf.setToolTipText("<HTML>\nThe minimum number of players in this station<br>\nEnsure that the total # of min. players in all tables is less than or equal to # of players <br>\nAlso make sure min player is less than or equal to preferred/maximum number of players");
@@ -671,6 +670,15 @@ public class AddStation extends JDialog {
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			
+			btnHelp = new JButton("Help");
+			btnHelp.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					openHelp();
+				}
+
+			});
+			buttonPane.add(btnHelp);
 			{
 				okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
@@ -684,5 +692,9 @@ public class AddStation extends JDialog {
 			}
 		}
 		updateRankPrefUI();
+	}
+	private void openHelp() {
+		StationHelpBox newFrame = new StationHelpBox(this);
+		newFrame.setVisible(true);
 	}
 }

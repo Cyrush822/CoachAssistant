@@ -256,5 +256,21 @@ public class FinalStation {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
+
+	public ArrayList<Player> getManuallyAddedPlayers() {
+		return manuallyAddedPlayers;
+	}
+
+	public void setManuallyAddedPlayers(ArrayList<Player> manuallyAddedPlayers) {
+		this.manuallyAddedPlayers = manuallyAddedPlayers;
+	}
+
+	public FinalStationMasterList getFinalStationList() {
+		return finalStationList;
+	}
+
+	public void setFinalStationList(FinalStationMasterList finalStationList) {
+		this.finalStationList = finalStationList;
+	}
 	
 }

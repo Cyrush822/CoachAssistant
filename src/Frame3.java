@@ -106,8 +106,18 @@ public class Frame3 extends JFrame {
 		
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean allSame = true;
+				for(FinalStation station : finalStationList.getFinalStations()) {
+					if(!station.getCurrentPlayers().equals(station.getManuallyAddedPlayers())) {
+						allSame = false;
+					}
+				}
 				for(int i = 0; i < finalStationList.getFinalStations().size(); i++) {
-					finalStationList.getFinalStations().get(i).clearPlayers();
+					if(allSame) {
+						finalStationList.getFinalStations().get(i).trueClearPlayers();
+					} else {
+						finalStationList.getFinalStations().get(i).clearPlayers();
+					}
 					updateFinalStationList();
 					updatePlayersLeft();
 				}
@@ -171,8 +181,7 @@ public class Frame3 extends JFrame {
 							.addComponent(btnHistory)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnSave))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addContainerGap(403, Short.MAX_VALUE)
+						.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
 							.addComponent(btnBack)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnNext))

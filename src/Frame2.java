@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dialog.ModalExclusionType;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,6 +60,7 @@ public class Frame2 extends JFrame {
 
 	private boolean tempOn;
 	private JLabel lblTemp;
+	private JButton btnHelp;
 	/**
 	 * Create the frame.
 	 */
@@ -335,6 +337,13 @@ public class Frame2 extends JFrame {
 		lblMax = new JLabel("Max:");
 		
 		lblRequiredMax = new JLabel("99");
+		
+		btnHelp = new JButton("Help");
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openFrame2Help();
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -344,23 +353,27 @@ public class Frame2 extends JFrame {
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(6)
 							.addComponent(lblTemp)
-							.addPreferredGap(ComponentPlacement.RELATED, 159, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+							.addComponent(btnHelp)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnBack, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnNext)
 							.addGap(8))
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-								.addComponent(btnEditStation, Alignment.LEADING)
-								.addComponent(btnNewStation, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(btnDeleteAll, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
-								.addGroup(Alignment.LEADING, gl_contentPane.createParallelGroup(Alignment.TRAILING)
-									.addComponent(btnNewButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(btnDeleteStation, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 116, Short.MAX_VALUE)
-									.addComponent(btnTemp, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)))
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnEditStation)
+								.addComponent(btnNewStation, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnDeleteAll, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
+								.addComponent(btnDeleteStation, GroupLayout.PREFERRED_SIZE, 117, Short.MAX_VALUE)
+								.addComponent(btnTemp, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
 							.addGap(15)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_contentPane.createSequentialGroup()
+									.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+									.addContainerGap())
+								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
 									.addPreferredGap(ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
 									.addComponent(lblNumberOfPresent)
 									.addPreferredGap(ComponentPlacement.RELATED)
@@ -377,19 +390,16 @@ public class Frame2 extends JFrame {
 									.addComponent(lblMax)
 									.addGap(4)
 									.addComponent(lblRequiredMax, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE)
-									.addGap(7))
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
-									.addContainerGap())))))
+									.addGap(7))))))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 266, GroupLayout.PREFERRED_SIZE))
-						.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(16)
 							.addComponent(btnNewStation)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -399,8 +409,7 @@ public class Frame2 extends JFrame {
 							.addGap(47)
 							.addComponent(btnNewButton)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnTemp)
-							.addGap(46)))
+							.addComponent(btnTemp)))
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGap(11)
@@ -421,7 +430,8 @@ public class Frame2 extends JFrame {
 							.addGap(8)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(btnNext)
-								.addComponent(btnBack)))
+								.addComponent(btnBack)
+								.addComponent(btnHelp)))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnDeleteAll)
@@ -436,5 +446,9 @@ public class Frame2 extends JFrame {
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		scrollPane.setColumnHeaderView(lblNewLabel);
 		contentPane.setLayout(gl_contentPane);
+	}
+	public void openFrame2Help() {
+		Frame2Help newFrame = new Frame2Help();
+		newFrame.setVisible(true);
 	}
 }

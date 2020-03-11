@@ -13,30 +13,33 @@ public class Player implements Serializable {
 	private boolean isAbsent;
 	private float avgRank;
 	private Player partner;
+	private int playerID;
 	/**
 	makes a new Player object, which stores all the information about one player.
 	@param String name, int rank, boolean isMale, boolean isAbsent
 	@return Player
 	*/
-	public Player(String setName, int setRank, boolean setIsMale, boolean setIsAbsent) {
+	public Player(String setName, int setRank, boolean setIsMale, boolean setIsAbsent, int playerID) {
 		name = setName;
 		rank = setRank;
 		isMale = setIsMale;
 		isAbsent = setIsAbsent;
 		avgRank = 0;
 		partner = null;
+		this.playerID = playerID;
 	}
 	/**
 	makes a new Player object, which stores all the information about one player.
 	@param String name, int rank, boolean isMale, boolean isAbsent, Player partner
 	@return Player
 	*/
-	public Player(String setName, int setRank, boolean setIsMale, boolean setIsAbsent, Player partner) {
+	public Player(String setName, int setRank, boolean setIsMale, boolean setIsAbsent, Player partner, int playerID) {
 		name = setName;
 		rank = setRank;
 		isMale = setIsMale;
 		isAbsent = setIsAbsent;
 		avgRank = 0;
+		this.playerID = playerID;
 		this.partner = partner;
 	}
 	
@@ -175,6 +178,13 @@ public class Player implements Serializable {
 		this.isAbsent = isAbsent;
 		save();
 	}
-	
-	
+	public int getPlayerID() {
+		return playerID;
+	}
+	public void setPlayerID(int playerID) {
+		this.playerID = playerID;
+	}
+	public boolean compareID(int playerID) {
+		return this.playerID == playerID;
+	}
 }
