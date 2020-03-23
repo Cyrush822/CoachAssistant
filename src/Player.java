@@ -11,7 +11,8 @@ public class Player implements Serializable {
 	private int rank;
 	private boolean isMale;
 	private boolean isAbsent;
-	private float avgRank;
+	private int numOfPractice;
+	private float avgRank;//avgRank = rank sum / numOfPractice
 	private Player partner;
 	private int playerID;
 	/**
@@ -51,6 +52,11 @@ public class Player implements Serializable {
 		if(isMale)
 			return "M";
 		return "F";
+	}
+	public void updateAvgRanking() {
+		avgRank = ((avgRank * numOfPractice) + rank) /(numOfPractice + 1);
+		numOfPractice++;
+		save();
 	}
 	/**
 	saves this player. Deletes the old version and serializes the current version. 

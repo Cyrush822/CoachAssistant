@@ -294,6 +294,7 @@ public class MasterPlayerList implements Serializable{
         catch(IOException ex) 
         { 
             System.out.println("IOException is caught"); 
+            filename.delete();
             return null;
         } 
           

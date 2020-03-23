@@ -1,15 +1,25 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+import java.time.*;
 
-public class FinalStationMasterList {
+public class FinalStationMasterList implements Serializable{
 	private File dir;
+	private File thisFile;
+	private File associatedWordDoc;
 	private ArrayList<FinalStation> finalStations;
+	private String fileName = "savedConfig";
+	private String savedConfigsDirName = "savedConfigs";
+	
+	private LocalTime savedTime;
+	private LocalDate savedDate;
 	private MasterPlayerList playerList;
 
 	private ArrayList<Player> players;// players that are not absent, taken from playerList
@@ -21,6 +31,7 @@ public class FinalStationMasterList {
 //		System.out.println();
 //	}
 	public FinalStationMasterList(MasterPlayerList playerList) {
+		this.dir = new File("savedConfigs");
 		finalStations = new ArrayList<FinalStation>();
 		players = playerList.getPresentPlayerList();
 		availablePlayers = new ArrayList<Player>();
@@ -84,17 +95,48 @@ public class FinalStationMasterList {
 		}
 		return finalList;
 	}
+	/*
+	 * The master method to generate stations. Automatically fills every station in 
+	 * finalStations with players according to their configurations.
+	 * However, very random and unoptimized... Will not work if there's too many configs,
+	 * and relies heavily on luck and tons of tries to get one config that fits all 
+	 * required parameters.
+	 * Current Logic:
+	 * 1. Calculate maxAttempts according to finalStations size (larger = higher)
+	 * 2. While attempts below MaxAttempts
+	 * 	a.) Calculate priority for each station and sort
+	 *  b.) Attempt to fill each station to their MINIMUM number of players required
+	 *  	IF RETURNS TRUE (it succeeded), continue.
+	 *  	IF RETURNS FALSE (it failed. Players don't fit required parameters), break.
+	 *  c.) First, check if every station has minimum players
+	 *  	IF NOT: (b returned false) break and add 1 to attempts
+	 *  	IF YES: (b returned true), continue:
+	 *  d.) are there are still players left to assign?
+	 *  	IF YES: call useUpRemaining candidates to see if we can successfully add 
+	 *  			all remaining players into stations until all players are gone
+	 *  			Store whether it worked or not in successful. 
+	 *  	IF NOT: break (SUCCESS!!!)
+	 *  e.) Was using up remaining candidates successful?
+	 *  	IF YES: break (SUCCESS!!!)
+	 *  	IF NOT: continue and add 1 to attempts
+	 *  
+	 *  
+	 *  f.) If by the end of this (attempts exceeded max attempts), there are still students
+	 *  	Display error message.
+	 * TODO: refine process for calculating maxAttempts so it calculates according to
+	 * How many paramters, not stations.
+	 */
 	public void generateStations() {
 		int attempts = 0;
-		
-		while(attempts < Math.pow(finalStations.size(), 2)) {
+		int maxAttempts = (int)Math.pow(finalStations.size(), 2);
+		while(attempts < maxAttempts) {
 			for(FinalStation station : finalStations) {
 				station.clearPlayers();
 				station.calculatePriority();
 			}
 			reorderStationsByPriority();
-			printStationsAndPriority();
-			for(int i = 0; i <finalStations.size(); i++) {
+			//printStationsAndPriority();
+			for(int i = 0; i < finalStations.size(); i++) {
 				if(!fillStationToMin(finalStations.get(i))) {
 					break;
 				}
@@ -170,6 +212,11 @@ public class FinalStationMasterList {
 		}
 		return true;
 	}
+	/**
+	 * returns whether or not all stations in finalStations are at there preferred number of
+	 * players
+	 * @return boolean
+	 */
 	private boolean allStationsAreAtPref() {
 		for(FinalStation station : finalStations) {
 			if(!station.satisfiedPreferredNumberOfPlayers())
@@ -177,6 +224,11 @@ public class FinalStationMasterList {
 		}
 		return true;
 	}
+	/**
+	 * returns whether or not all stations in finalStations are at there minimum number of
+	 * players
+	 * @return boolean
+	 */
 	private boolean allStationsAreAtMin() {
 		for(FinalStation station : finalStations) {
 			if(!station.satisfiedMinimum())
@@ -184,18 +236,59 @@ public class FinalStationMasterList {
 		}
 		return true;
 	}
+	/**
+	 * clear all stations of their current players (BUT NOT MANUALLY ASSIGNED PLAYERS.)
+	 */
 	private void clearStations() {
 		for(FinalStation station : finalStations) {
 			station.clearPlayers();
-			station.calculatePriority();
 		}
 	}
+	/**
+	 * monster method that takes in a station and fills it up to its minimum number of 
+	 * players with available players, according to its configs
+	 * 
+	 * Will try to use the list of players that is most preferable, and choose random
+	 * players from that list.
+	 * 
+	 * 1.If station is full, return true
+	 * 2.Loop while attempts is below maxAttempts
+	 * 3.If the station is already satisfied (it's filled to min) , break.
+	 * 3.declare list of players that will be used to get random players (targetList)
+	 * 4.calculate lists, and the first list that isn't empty (most preferable list) is
+	 * 	assigned to targetList by (kinda) reference
+	 * 5.If targetList is empty (meaning every single one of the candidate lists (even
+	 * were empty, which means there are NO players that fit all of the required parameters)
+	 * continue, clear station, and add 1 to attempts.
+	 * 6.If the station's minimum number of players is not satisfied, add a random candidate
+	 * From targetList into station. ADD RANDOM CANDIDATE AUTOMATICALLY ACCOUNTS FOR PARTNER.
+	 * If there's not enough slots for the partner, it will ignore it. If there are slots,
+	 * AND they have a partner, AND the partner is available, they will automatically be
+	 * added (doesn't care about configs...)
+	 * 7.Is the station's minimum number of players satisfied?
+	 * YES: break (SUCCESS!!)
+	 * NO: check through every player and see, do they have a partner that should be added?
+	 * (this is only useful for manually added players, as normal players would've already
+	 * have had their partners added in) If so, AND the list is not full AND the player is
+	 * available, add that partner. 
+	 * continue (go back to the while loop and try to add a new player) no +attempts because there was no fail.
+	 * 
+	 * AT THE END (either some part of the while loop had a break or if attempts > maxAttempts)
+	 * if station is satisfied, return true (success!)
+	 * if not, return false (failed)
+	 * @param station
+	 * @return boolean indicating successfully filled station or not
+	 */
 	private boolean fillStationToMin(FinalStation station) {//returns successful or not
 		if(station.isFull()) {
 			return true;
 		}
 		int attempts = 0;
-		while(attempts < Math.pow(station.getStation().getMinPlayers(), 3) ) {
+		int maxAttempts = (int)Math.pow(station.getStation().getMinPlayers(), 3);
+		while(attempts <  maxAttempts) {
+			if(station.satisfiedMinimum()) {
+				break;
+			}
 			ArrayList<Player> targetList = new ArrayList<Player>();
 			station.calculateLists();
 			for(int i = 0; i < station.getCandidateLists().size(); i++) {
@@ -221,29 +314,38 @@ public class FinalStationMasterList {
 							existingPlayers.add(player);
 						}
 						for(Player player : existingPlayers) {
-							if(!station.getCurrentPlayers().contains(player.getPartner())) {
-								if(this.availablePlayers.contains(player.getPartner()) && station.getCurrentPlayers().size() <= 3) {
-									station.addPlayer(player.getPartner());
-									updateAvailablePlayers();
+							if(player.hasPartner()) {
+								if(!station.getCurrentPlayers().contains(player.getPartner())) {
+									if(this.availablePlayers.contains(player.getPartner()) && station.getCurrentPlayers().size() <= 3) {
+										station.addPlayer(player.getPartner());
+										updateAvailablePlayers();
+									}
 								}
 							}
 						}
-						attempts++;
-						continue;
 					}
 				}
 			}
+			attempts++;
 		}
 		if(station.satisfiedMinimum()) {
 			return true;
 		}
 		return false;
 	}
+	public String toString() {
+		return "savedConfig" + savedDate.toString() + " " + savedTime.getHour() 
+		+ ":" + savedTime.getMinute() + ":" + savedTime.getSecond();
+	}
 	private void printStationsAndPriority() {
 		for(int i = 0; i < finalStations.size(); i++) {
 			System.out.println(finalStations.get(i) + Integer.toString(finalStations.get(i).getPriority()));
 		}
 	}
+	/**
+	 * sorts stations by priority
+	 * currently uses bubble sort
+	 */
 	public void reorderStationsByPriority() {
 		for(FinalStation station : finalStations) {
 			station.calculatePriority();
@@ -258,36 +360,27 @@ public class FinalStationMasterList {
 			}
 		}
 	}
-	public boolean addCandidates(FinalStation station, int listNumber, int numberOfCandidates) {
-		for(int i = 0; i < numberOfCandidates; i++) {
-			if(!addRandomCandidate(station, station.getCandidateLists().get(listNumber))) {
-				return false;
-			} else {
-				station.calculateLists();
-			}
-		}
-		return true;
-	}
+	/**
+	 * takes a random candidate fromm the candidate list passed in
+	 * (chooses randomly until a player that is in "available players" is chosen by chance
+	 * Checks if the candidate chosen has a partner. If so:
+	 * 1. Is there a slot for them?
+	 * 2. are they available?
+	 * if both are true, add
+	 * if both are not true, don't add and don't use the target candidate.
+	 * 
+	 * Keep trying until the player is available and has a partner that can be added/has no partner.
+	 * If tries exceed 50 (temp number), return false (it failed!)
+	 * @param station
+	 * @param candidates
+	 * @return
+	 */
 	public boolean addRandomCandidate(FinalStation station, ArrayList<Player> candidates) {
 		if(candidates.size() <= 0) {
 			return false;
 		}
 		int index = 99999;
 		int attempts = 0;
-//		if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
-////			ArrayList<Player> existingPlayers = new ArrayList<Player>();
-////			for(Player player : station.getCurrentPlayers()) {
-////				existingPlayers.add(player);
-////			}
-////			for(Player player : existingPlayers) {
-////				if(!station.getCurrentPlayers().contains(player.getPartner())) {
-////					if(this.availablePlayers.contains(player.getPartner()) && station.getCurrentPlayers().size() <= 3) {
-////						station.addPlayer(player.getPartner());
-////						updateAvailablePlayers();
-////					}
-////				}
-////			}
-//		}
 		while(attempts < 50) {
 			index = (int) (candidates.size() * Math.random());
 			if(!availablePlayers.contains(candidates.get(index))) {
@@ -320,14 +413,20 @@ public class FinalStationMasterList {
 		return true;
 	}
 	/**
-	 * returns all the players that are not in this array
+	 * returns all the players that are not in this array using their unique playerID
 	 * @param players
 	 * @return
 	 */
 	public ArrayList<Player> invertPlayerList(ArrayList<Player> players) {
 		ArrayList<Player> finalList = new ArrayList<Player>();
 		for(int i = 0; i < availablePlayers.size(); i++) {
-			if(!(players.contains(availablePlayers.get(i)))) {
+			boolean isInlist = false;
+			for(int a = 0; a < players.size(); a++) {
+				if(players.get(a).getPlayerID() == availablePlayers.get(i).getPlayerID()) {
+					isInlist = true;
+				}
+			}
+			if(!isInlist) {
 				finalList.add(availablePlayers.get(i));
 			}
 		}
@@ -368,7 +467,72 @@ public class FinalStationMasterList {
 		}
 		return candidates;
 	}
-
+	/**
+	 * returns the list of players in previous generations of the station (if they have the same tag)
+	 * in order by time (earliest in the front (0))
+	 * @param target
+	 * @return list of player Lists (candidates)
+	 */
+	public ArrayList<ArrayList<Player>> getPreviousConfigLists(FinalStation target) {
+		ArrayList<ArrayList<Player>> result = new ArrayList<ArrayList<Player>>();
+		File oldConfigDir = new File(Frame3.dirName);
+		if(!oldConfigDir.exists()) {
+			oldConfigDir.mkdir();
+			return result;
+		}
+		ArrayList<FinalStationMasterList> oldConfigs = new ArrayList<FinalStationMasterList>();
+		for(File file : oldConfigDir.listFiles()) {
+			oldConfigs.add(this.deserializeFinalStationMasterList(file));
+		}
+		sortByTime(oldConfigs);
+		File settingsFile = new File(Frame3.settingsFileName);
+		if(!settingsFile.exists()) {
+			return result;
+		}
+		SavedSettings settings = this.deserializeSettings(settingsFile);
+		int configsToSave = settings.getConfigsSaved();
+		ArrayList<FinalStationMasterList> oldConfigsToUse = new ArrayList<FinalStationMasterList>();
+		if(oldConfigs.size() <= configsToSave) {
+			oldConfigsToUse = oldConfigs;
+		} else {
+			for(int i = configsToSave; i > 0; i--) {
+				oldConfigsToUse.add(oldConfigs.get(oldConfigs.size() - i));
+			}
+		}
+		for(FinalStationMasterList config : oldConfigsToUse) {
+			for(FinalStation station : config.getFinalStations()) {
+				if(station.getStation().getStationDesc().equals(target.getStation().getStationDesc())) {
+					result.add(invertPlayerList(station.getCurrentPlayers()));
+				}
+			}
+		}
+		return result;
+	}
+	/**
+	 * sorts masterLists from earliest(0) to latest (n - 1)
+	 * @param masterStationLists
+	 * @return
+	 */
+	private void sortByTime(ArrayList<FinalStationMasterList> stationLists) {
+		for(int i = stationLists.size() - 1; i > 0; i--) {
+			for(int a = 0; a < i; a++) {
+				if(stationLists.get(a).getSavedDate().isAfter(stationLists.get(a+1).getSavedDate())) {
+					FinalStationMasterList holder = stationLists.get(a);
+					stationLists.set(a, stationLists.get(a+1));
+					stationLists.set(a+1, holder);
+				}
+			}
+		}
+		for(int i = stationLists.size() - 1; i > 0; i--) {
+			for(int a = 0; a < i; a++) {
+				if(stationLists.get(a).getSavedDate().isEqual(stationLists.get(a+1).getSavedDate()) && stationLists.get(a).getSavedTime().isAfter(stationLists.get(a+1).getSavedTime())) {
+					FinalStationMasterList holder = stationLists.get(a);
+					stationLists.set(a, stationLists.get(a+1));
+					stationLists.set(a+1, holder);
+				}
+			}
+		}
+	}
 	public ArrayList<Player> getRankPreferenceList(FinalStation target) {
 		updateAvailablePlayers();
 		if(target.getStation().getRankPref().equals(MasterStationList.rankPreference.allow)) {
@@ -431,7 +595,75 @@ public class FinalStationMasterList {
 	public void getStation(int index) {
 		finalStations.get(index);
 	}
-
+	public void setTimeAndName() {
+		savedTime = LocalTime.now();
+		savedDate = LocalDate.now();
+		fileName = "savedConfig" + savedTime.toString();
+	}
+	public void save() {
+	    if (!dir.exists()){
+	        dir.mkdir();
+	    }
+	    File oldFile = new File(dir.getPath() + "/" + fileName);
+	    if(oldFile.exists()) {
+	    	oldFile.delete();
+	    }
+	    try {
+            FileOutputStream fileOut = new FileOutputStream(dir.getPath() + "/" + fileName);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(this);
+            objectOut.close();
+            System.out.println("The Object was succesfully written to a file");
+ 
+        } catch (Exception ex) {
+        	int option = JOptionPane.showConfirmDialog(null, "an error has occurred while saving "
+        			+ "this config. "
+        			+ "this shouldn't ever happen and if you see this message "
+        			+ "that means Cyrus messed up. He assures you he feels really bad "
+        			+ "about this. ");
+        	if(option == 0) {
+        		dir.delete();
+        	}
+            ex.printStackTrace();
+        }
+	}
+	public void delete() {
+		File thisFile = new File(dir.getPath() + "/" + fileName);
+		if(thisFile.exists()) {
+	    	thisFile.delete();
+	    }
+	}
+	/**
+	 * adds 1 to the int at the end of the name
+	 * if the int is higher than maximum, the file is deleted.
+	 * @param maximum
+	 */
+	public String getNewNameAddedOne(int maximum) {
+		String lastChar = fileName.substring(fileName.length() - 1, fileName.length());
+		int newInt = 1;
+		try {//there's no number after savedConfig (it's just savedConfig)
+			newInt = Integer.parseInt(lastChar);
+		}
+		catch(Exception e) {
+			return fileName+1;
+		}
+		newInt++;//the number after savedConfig (e.g. savedConfig2 -> 2)
+		if(newInt > maximum +1) {//if the number is too big after adding 1, return null
+			//delete this station. 
+			return null;
+		}
+		return fileName.substring(0,fileName.length() - 1) + newInt;
+	}
+	public void changeNameAndDeleteOldCopy(String newName) {
+		delete();
+		this.fileName = newName;
+		save();
+	}
+	public void moveToNewDir(File newDir) {
+		delete();
+		this.dir = newDir;
+		save();
+	}
 	public FinalStation deserializeStation(File filename) {
 		try {
 			// Reading the object from a file
@@ -458,14 +690,7 @@ public class FinalStationMasterList {
 			return null;
 		}
 	}
-
-	public File getDir() {
-		return dir;
-	}
-
-	public void setDir(File dir) {
-		this.dir = dir;
-	}
+	
 
 	public ArrayList<FinalStation> getFinalStations() {
 		this.reorderStationsByPriority();
@@ -497,6 +722,70 @@ public class FinalStationMasterList {
 		sortPlayersByRank(availablePlayers);
 		return availablePlayers;
 	}
+	public SavedSettings deserializeSettings(File file) {
+		if(!file.exists()) {
+			return new SavedSettings();
+		}
+		try
+        {    
+            // Reading the object from a file 
+            FileInputStream fileIn = new FileInputStream(file); 
+            ObjectInputStream in = new ObjectInputStream(fileIn); 
+              
+            // Method for deserialization of object 
+            SavedSettings settings = (SavedSettings)in.readObject(); 
+              
+            in.close(); 
+            fileIn.close(); 
+              
+            System.out.println("Object has been deserialized "); 
+            return settings;
+        } 
+          
+        catch(IOException ex) 
+        { 
+            System.out.println("IOException is caught"); 
+        	file.delete();
+        	System.out.println("settings deleted");
+        	System.out.println("retrying...");
+            return deserializeSettings(file);
+        } 
+          
+        catch(ClassNotFoundException ex) 
+        { 
+            System.out.println("ClassNotFoundException is caught"); 
+            return null;
+        } 
+	}
+	public FinalStationMasterList deserializeFinalStationMasterList(File file) {
+		try
+        {    
+            // Reading the object from a file 
+            FileInputStream fileInput = new FileInputStream(file); 
+            ObjectInputStream in = new ObjectInputStream(fileInput); 
+              
+            // Method for deserialization of object 
+            FinalStationMasterList stationList = (FinalStationMasterList)in.readObject(); 
+              
+            in.close(); 
+            fileInput.close(); 
+              
+            System.out.println("Object has been deserialized "); 
+            return stationList;
+        } 
+          
+        catch(IOException ex) 
+        { 
+            System.out.println("IOException is caught"); 
+            return null;
+        } 
+          
+        catch(ClassNotFoundException ex) 
+        { 
+            System.out.println("ClassNotFoundException is caught"); 
+            return null;
+        } 
+	}
 	public void sortPlayersByRank(ArrayList<Player> players) {
 		for(int i = players.size(); i > 0; i--) {
 			for(int a = 0; a < i - 1; a++) {
@@ -510,5 +799,44 @@ public class FinalStationMasterList {
 	}
 	public void setAvailablePlayers(ArrayList<Player> availablePlayers) {
 		this.availablePlayers = availablePlayers;
+	}
+
+	public LocalTime getSavedTime() {
+		return savedTime;
+	}
+
+	public void setSavedTime(LocalTime savedTime) {
+		this.savedTime = savedTime;
+	}
+
+	public File getAssociatedWordDoc() {
+		return associatedWordDoc;
+	}
+
+	public void setAssociatedWordDoc(File associatedWordDoc) {
+		this.associatedWordDoc = associatedWordDoc;
+	}
+
+	public File getThisFile() {
+		thisFile = new File(dir.getPath() + "/" + fileName);
+		return thisFile;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public File getDir() {
+		return dir;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public LocalDate getSavedDate() {
+		return savedDate;
+	}
+
+	public void setSavedDate(LocalDate savedDate) {
+		this.savedDate = savedDate;
 	}
 }

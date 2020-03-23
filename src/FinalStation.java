@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.awt.*; 
-public class FinalStation {
+public class FinalStation implements Serializable{
 	
 	private Station station;
 	private FinalStationMasterList pastList;
@@ -104,53 +104,108 @@ public class FinalStation {
 			System.out.println(this.candidateLists.get(i));
 		}
 	}
+	public ArrayList<Player> getList(int n, ArrayList<Player> rankDiff,ArrayList<Player> genderPref, 
+			ArrayList<Player> rankPref, ArrayList<ArrayList<Player>> oldConfigPlayerLists, ArrayList<Player> result) {
+		
+		ArrayList<ArrayList<Player>> playerListsToMerge = new ArrayList<ArrayList<Player>>();
+		playerListsToMerge.add(result);
+		if(n <= 0) {
+			if(this.station.isRanked()) {
+				playerListsToMerge.add(rankDiff);
+			}
+			if(this.station.getRankPreferenceImportance() == 3) {
+				playerListsToMerge.add(rankPref);
+			}
+			if(this.station.getGenderPrefImportance() == 3) {
+				playerListsToMerge.add(genderPref);
+			}
+			result = mergePlayerLists(playerListsToMerge);
+			return result;
+		}
+		for(int i = 0; i < oldConfigPlayerLists.size();i++) {//latest to earliest
+			if(n == i + 1) {
+				playerListsToMerge.add(oldConfigPlayerLists.get(oldConfigPlayerLists.size() - 1 - i));
+			}
+		}
+		if(n == 1 + oldConfigPlayerLists.size()){
+			if(this.station.getRankPreferenceImportance() == 2) {
+				playerListsToMerge.add(rankPref);
+			}
+		}
+		if(n == 2 + oldConfigPlayerLists.size()) {
+			if(this.station.getGenderPrefImportance() == 2) {
+				playerListsToMerge.add(genderPref);
+			}
+		}
+		if(n == 3 + oldConfigPlayerLists.size()) {
+			if(this.station.getRankPreferenceImportance() == 1) {
+				playerListsToMerge.add(rankPref);
+			}
+		}
+		if(n == 4 + oldConfigPlayerLists.size()) {
+			if(this.station.getGenderPrefImportance() == 1) {
+				playerListsToMerge.add(genderPref);
+			}
+		}
+		result = mergePlayerLists(playerListsToMerge);
+		return getList(n - 1, rankDiff, genderPref,rankPref,oldConfigPlayerLists, result);
+	}
 	public void calculateLists() {//0 is most preferable (least # of candidates) and 4 is least preferable
 		candidateLists = new ArrayList<ArrayList<Player>>();
+		System.out.println(this.station.getStationName() + "PLAYERS: " + this.getCurrentPlayers());
+		System.out.println("all players: " + finalStationList.getAvailablePlayers());
 		ArrayList<Player> candidatesForRankDifference = finalStationList.getRankDifferenceList(this);
 		System.out.println(this.station.getStationName() + "candrank: " + candidatesForRankDifference);
 		ArrayList<Player> candidatesForGenderDifference = finalStationList.getGenderDifferenceList(this);
 		System.out.println(this.station.getStationName() + "candGender: " + candidatesForGenderDifference);
 		ArrayList<Player> candidatesForRankPreference = finalStationList.getRankPreferenceList(this);
 		System.out.println(this.station.getStationName() + "candrankpref: " + candidatesForRankPreference);
-		for(int i = 0; i < 6;i++) {
-			ArrayList<ArrayList<Player>> playerListsToMerge = new ArrayList<ArrayList<Player>>();
-			playerListsToMerge.add(finalStationList.getAvailablePlayers());
-			switch(i)  {
-			case 0:
-				if(this.station.getGenderPrefImportance() == 1) {
-					playerListsToMerge.add(candidatesForGenderDifference);
-				}
-			case 1:
-				if(this.station.getRankPreferenceImportance() == 1) {
-					playerListsToMerge.add(candidatesForRankPreference);
-				}
-			case 2:
-				if(this.station.getGenderPrefImportance() == 2) {
-					playerListsToMerge.add(candidatesForGenderDifference);
-				}
-			case 3:
-				if(this.station.getRankPreferenceImportance() == 2) {
-					playerListsToMerge.add(candidatesForRankPreference);
-				}
-			case 5:
-				//add previous save here
-			case 4: {
-				if(this.station.getCompType() != MasterStationList.competitiveType.notCompetitive) {
-					playerListsToMerge.add(candidatesForRankDifference);
-				}
-				if(this.station.getRankPreferenceImportance() == 3) {
-					playerListsToMerge.add(candidatesForRankPreference);
-				}
-				if(this.station.getGenderPrefImportance() == 3) {
-					playerListsToMerge.add(candidatesForGenderDifference);
-				}
-				break;
-			}
-			default: {
-				break;
-			}
-			}
-			candidateLists.add(i, mergePlayerLists(playerListsToMerge));
+		ArrayList<ArrayList<Player>> oldConfigs = finalStationList.getPreviousConfigLists(this);
+		for(int i = 0; i < oldConfigs.size(); i++) {
+			System.out.println(this.station.getStationName() + "oldConfigs(" + i + "): " + oldConfigs.get(i));
+		}
+		for(int i = 4 + oldConfigs.size() - 1; i >= 0;i--) {
+			
+//			ArrayList<ArrayList<Player>> playerListsToMerge = new ArrayList<ArrayList<Player>>();
+//			playerListsToMerge.add(finalStationList.getAvailablePlayers());
+//			switch(i)  {
+//			case 0:
+//				if(this.station.getGenderPrefImportance() == 1) {
+//					playerListsToMerge.add(candidatesForGenderDifference);
+//				}
+//			case 1:
+//				if(this.station.getRankPreferenceImportance() == 1) {
+//					playerListsToMerge.add(candidatesForRankPreference);
+//				}
+//			case 2:
+//				if(this.station.getGenderPrefImportance() == 2) {
+//					playerListsToMerge.add(candidatesForGenderDifference);
+//				}
+//			case 3:
+//				if(this.station.getRankPreferenceImportance() == 2) {
+//					playerListsToMerge.add(candidatesForRankPreference);
+//				}
+////			case 5:
+////				//add previous save here
+//			case 4: {
+//				if(this.station.isRanked()) {
+//					playerListsToMerge.add(candidatesForRankDifference);
+//				}
+//				if(this.station.getRankPreferenceImportance() == 3) {
+//					playerListsToMerge.add(candidatesForRankPreference);
+//				}
+//				if(this.station.getGenderPrefImportance() == 3) {
+//					playerListsToMerge.add(candidatesForGenderDifference);
+//				}
+//				break;
+//			}
+//			default: {
+//				break
+//			}
+//			}
+			candidateLists.add(getList(i,candidatesForRankDifference, 
+					candidatesForGenderDifference, candidatesForRankPreference,oldConfigs,
+					finalStationList.getAvailablePlayers()));
 		}
 	}
 	public Player getRandomPlayerFromList(ArrayList<Player> playerList) {

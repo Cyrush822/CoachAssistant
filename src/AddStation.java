@@ -323,6 +323,10 @@ public class AddStation extends JDialog {
 					+ "required is not less than 0");
 			return;
 		}
+		int maxRank = (int)this.spinnerRankDifference.getValue();
+		if(!chckbxTakeRanksInto.isSelected()) {
+			maxRank = 0;
+		}
 		MasterStationList.competitiveType compType;
 		if(!checkBoxComp.isSelected()) {
 			compType = MasterStationList.competitiveType.notCompetitive;

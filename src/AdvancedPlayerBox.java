@@ -30,6 +30,7 @@ public class AdvancedPlayerBox extends JDialog {
 	private JButton btnSet;
 	private JButton btnunset;
 	private JLabel lblPlayerid;
+	private JLabel labelAvgRank;
 	
 	/**
 	 * Launch the application.
@@ -48,11 +49,11 @@ public class AdvancedPlayerBox extends JDialog {
 	 * Create the dialog.
 	 */
 	public AdvancedPlayerBox(Player target, MasterPlayerList playerList) {
-		setModal(true);
 		initComponents();
 		createEvents();
 		this.setTitle("advanced settings: " + target.getName());
 		this.lblPlayerid.setText("PlayerID: " + target.getPlayerID());
+		this.labelAvgRank.setText(Float.toString(target.getAvgRank()));
 		this.player = target;
 		this.partneredPlayer = new PartneredPlayer(target);
 		this.playerList = playerList;
@@ -206,9 +207,17 @@ public class AdvancedPlayerBox extends JDialog {
 		
 		JLabel lblAverageRanking = new JLabel("Average Ranking:");
 		
-		JLabel label = new JLabel("00.00");
+		labelAvgRank = new JLabel("00.00");
 		
 		lblPlayerid = new JLabel("PlayerID: 000000000000000000000");
+		
+		JButton btnNewButton = new JButton("Avg Rank List");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AverageRankList frame = new AverageRankList(playerList);
+				frame.setVisible(true);
+			}
+		});
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -233,12 +242,13 @@ public class AdvancedPlayerBox extends JDialog {
 								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(lblAverageRanking)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblAverageRanking)
+								.addComponent(lblPlayerid))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(label, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblPlayerid)))
+							.addComponent(labelAvgRank, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
+							.addComponent(btnNewButton)))
 					.addContainerGap(6, Short.MAX_VALUE))
 		);
 		gl_contentPanel.setVerticalGroup(
@@ -254,7 +264,7 @@ public class AdvancedPlayerBox extends JDialog {
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addGroup(gl_contentPanel.createSequentialGroup()
 									.addComponent(btnSet)
-									.addPreferredGap(ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
 									.addComponent(btnunset)
 									.addGap(1))
 								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
@@ -262,11 +272,14 @@ public class AdvancedPlayerBox extends JDialog {
 							.addGap(37)
 							.addComponent(lblPartner)))
 					.addGap(31)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblAverageRanking)
-						.addComponent(label))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblPlayerid)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblAverageRanking)
+								.addComponent(labelAvgRank))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblPlayerid))
+						.addComponent(btnNewButton))
 					.addGap(56))
 		);
 		
