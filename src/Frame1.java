@@ -109,7 +109,7 @@ public class Frame1 {
 		if(selected == null) {
 			return;
 		}
-		int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this player? "
+		int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this/these players? "
 				+ "If he has a partner, it will be unassigned and his average ranking will"
 				+ "be gone forever!");
 		if(option != 0) {

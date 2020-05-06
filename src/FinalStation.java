@@ -152,15 +152,17 @@ public class FinalStation implements Serializable{
 	}
 	public void calculateLists() {//0 is most preferable (least # of candidates) and 4 is least preferable
 		candidateLists = new ArrayList<ArrayList<Player>>();
-		System.out.println(this.station.getStationName() + "PLAYERS: " + this.getCurrentPlayers());
+		System.out.println("Station name: " + this.station.getStationName());
+		System.out.println("Current players in station: " + this.getCurrentPlayers());
 		System.out.println("all players: " + finalStationList.getAvailablePlayers());
 		ArrayList<Player> candidatesForRankDifference = finalStationList.getRankDifferenceList(this);
-		System.out.println(this.station.getStationName() + "candrank: " + candidatesForRankDifference);
+		System.out.println("Possible Candidates Fulfilling Rank Difference Requirement: " + candidatesForRankDifference);
 		ArrayList<Player> candidatesForGenderDifference = finalStationList.getGenderDifferenceList(this);
-		System.out.println(this.station.getStationName() + "candGender: " + candidatesForGenderDifference);
+		System.out.println("Possible Candidates Fulfilling Gender Preference: " + candidatesForGenderDifference);
 		ArrayList<Player> candidatesForRankPreference = finalStationList.getRankPreferenceList(this);
-		System.out.println(this.station.getStationName() + "candrankpref: " + candidatesForRankPreference);
+		System.out.println("Possible Candidates Fulfilling Rank Preference: " + candidatesForRankPreference);
 		ArrayList<ArrayList<Player>> oldConfigs = finalStationList.getPreviousConfigLists(this);
+		System.out.println("\n---------------------------------------------------------\n");
 		for(int i = 0; i < oldConfigs.size(); i++) {
 			System.out.println(this.station.getStationName() + "oldConfigs(" + i + "): " + oldConfigs.get(i));
 		}

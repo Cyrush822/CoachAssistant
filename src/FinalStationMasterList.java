@@ -21,9 +21,10 @@ public class FinalStationMasterList implements Serializable{
 	private LocalTime savedTime;
 	private LocalDate savedDate;
 	private MasterPlayerList playerList;
-	private SavedSettings settings;
+	transient private SavedSettings settings;
 	private ArrayList<Player> players;// players that are not absent, taken from playerList
 	private ArrayList<Player> availablePlayers;// players that are both not absent and available
+	transient private ArrayList<FinalStationMasterList> oldConfigs;
 	// (not being used for some station)
 
 //	public static void main(String[] args) {
@@ -136,7 +137,8 @@ public class FinalStationMasterList implements Serializable{
 	 * How many paramters, not stations.
 	 */
 	public void generateStations() {
-		settings = this.deserializeSettings(new File(Frame3.settingsFileName));
+		this.settings = this.deserializeSettings(new File(Frame3.settingsFileName));
+		this.oldConfigs = this.getOldConfigs();
 		int attempts = 0;
 		int maxAttempts = this.getGenerateStationsMaxAttempts();
 		while(attempts < maxAttempts) {
@@ -321,7 +323,6 @@ public class FinalStationMasterList implements Serializable{
 				if(station.satisfiedMinimum()) {
 					break;
 				} else {
-					System.out.println("partner system: " + settings.getPartnerSystemOn());
 					if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles) && settings.getPartnerSystemOn()) {
 						ArrayList<Player> existingPlayers = new ArrayList<Player>();
 						for(Player player : station.getCurrentPlayers()) {
@@ -482,6 +483,19 @@ public class FinalStationMasterList implements Serializable{
 		}
 		return candidates;
 	}
+	public ArrayList<FinalStationMasterList> getOldConfigs() {
+		ArrayList<FinalStationMasterList> deserializedOldConfigs = new ArrayList<FinalStationMasterList>();
+		File oldConfigDir = new File(Frame3.dirName);
+		if(!oldConfigDir.exists()) {
+			oldConfigDir.mkdir();
+			System.out.println("NO OLD CONFIG DIR FOUND. MAKING A NEW ONE");
+			return deserializedOldConfigs;
+		}
+		for(File file : oldConfigDir.listFiles()) {
+			deserializedOldConfigs.add(this.deserializeFinalStationMasterList(file));
+		}
+		return deserializedOldConfigs;
+	}
 	/**
 	 * returns the list of players in previous generations of the station (if they have the same tag)
 	 * in order by time (earliest in the front (0))
@@ -490,21 +504,11 @@ public class FinalStationMasterList implements Serializable{
 	 */
 	public ArrayList<ArrayList<Player>> getPreviousConfigLists(FinalStation target) {
 		ArrayList<ArrayList<Player>> result = new ArrayList<ArrayList<Player>>();
-		File oldConfigDir = new File(Frame3.dirName);
-		if(!oldConfigDir.exists()) {
-			oldConfigDir.mkdir();
-			return result;
-		}
-		ArrayList<FinalStationMasterList> oldConfigs = new ArrayList<FinalStationMasterList>();
-		for(File file : oldConfigDir.listFiles()) {
-			oldConfigs.add(this.deserializeFinalStationMasterList(file));
-		}
 		sortByTime(oldConfigs);
 		File settingsFile = new File(Frame3.settingsFileName);
 		if(!settingsFile.exists()) {
 			return result;
 		}
-		SavedSettings settings = this.deserializeSettings(settingsFile);
 		int configsToSave = settings.getConfigsSaved();
 		ArrayList<FinalStationMasterList> oldConfigsToUse = new ArrayList<FinalStationMasterList>();
 		if(oldConfigs.size() <= configsToSave) {

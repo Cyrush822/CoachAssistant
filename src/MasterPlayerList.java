@@ -208,10 +208,10 @@ public class MasterPlayerList implements Serializable{
 	 * @param exception (ranking of the player that is the exception). 
 	 * @return
 	 */
-	public boolean isNameOk(String name, int exception) {
+	public boolean isNameOk(String name, String exception) {
 		for(int i = 0; i < players.size(); i++) {
 			if(players.get(i).getName().equals(name)) {
-				if(i != exception - 1) {
+				if(!players.get(i).getName().equals(exception)) {
 					JOptionPane.showMessageDialog(null, "this name already exists! "
 							+ "Please use another name or include a last name.");
 					return false;
