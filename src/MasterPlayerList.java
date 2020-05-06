@@ -35,6 +35,9 @@ public class MasterPlayerList implements Serializable{
 			players.add(deserializePlayer(allFiles[i]));
 			lastRank++;
 		}
+		System.out.println("init players: " + players);
+		sort();
+		System.out.println("init players sorted: " + players);
 		playerNumber = this.getNumOfPlayers();
 	}
 	public int generatePlayerID() {
@@ -112,7 +115,6 @@ public class MasterPlayerList implements Serializable{
 	 */
 	
 	public void editPlayer(Player player, String newName, boolean newIsMale) {
-		sort();
 		if (player.getPartner() != null) {
 			player.getPartner().save();
 		}
@@ -163,6 +165,7 @@ public class MasterPlayerList implements Serializable{
 	 * @param rank2
 	 */
 	public void beatPlayer(int rank1, int rank2) {//rank1 is lower (better and got beat)
+		sort();
 		Player player1 = players.get(rank1 - 1);
 		Player player2 = players.get(rank2 - 1);
 		players.remove(rank2 - 1);
@@ -208,10 +211,13 @@ public class MasterPlayerList implements Serializable{
 	 * @param exception (ranking of the player that is the exception). 
 	 * @return
 	 */
-	public boolean isNameOk(String name, String exception) {
+	public boolean isNameOk(String name, int exception) {
+		System.out.println(players);
+		sort();
+		System.out.println("sorted " + players);
 		for(int i = 0; i < players.size(); i++) {
 			if(players.get(i).getName().equals(name)) {
-				if(!players.get(i).getName().equals(exception)) {
+				if(i+1 != exception) {
 					JOptionPane.showMessageDialog(null, "this name already exists! "
 							+ "Please use another name or include a last name.");
 					return false;

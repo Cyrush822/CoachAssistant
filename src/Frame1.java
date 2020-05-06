@@ -64,9 +64,6 @@ public class Frame1 {
 		createEvents();
 		assignLists();
 		recreatePartnerConnections();
-		for(int i = 0; i < 5; i++) {
-			System.out.println(playerList.generatePlayerID());
-		}
 	}
 	/**
 	 * initializes playerList and labelList. 
@@ -119,7 +116,8 @@ public class Frame1 {
 		updatePlayerLabels();
 	}
 	public void updatePlayerLabels() {
-		System.out.println(playerList);
+		playerList.sort(); 
+		System.out.println("players: " + playerList);
 		labelList.updatePlayerList(playerList);
 		labelList.updateLabels();
 	}
@@ -400,20 +398,24 @@ public class Frame1 {
 	 * swaps the two players that are selected right now. Updates labels, playerList, and saves. 
 	 */
 	private void swapPlayer() {
-		int rank1 = 0;//lower one
-		int rank2 = 0;
+		playerList.sort();
+		int rank1 = 100;//lower one
+		int rank2 = 100;
 		int numOfSelected = 0;
 		for(PlayerLabel PL : labelList.getPlayerLabelList()) {
 			if(PL.getIsSelected()) {
-				if(rank1 <= PL.getPlayer().getRank()) {
-					rank2 = rank1;
-					rank1 = PL.getPlayer().getRank();
-				}
-				else {
+				if(rank1 != 100) {
 					rank2 = PL.getPlayer().getRank();
+				} else {
+					rank1 = PL.getPlayer().getRank();
 				}
 				numOfSelected++;
 			}
+		}
+		if(rank1 > rank2) {
+			int holder = rank1;
+			rank1 = rank2;
+			rank2 = holder;
 		}
 		if (numOfSelected != 2) {
 			JOptionPane.showMessageDialog(null, "ERROR! Please select 2 and only 2 players.");
@@ -427,6 +429,7 @@ public class Frame1 {
 	 * simulates what happens if 1 player beats the other, updates labels, playerLists, and saves.
 	 */
 	private void beatPlayer() {
+		playerList.sort();
 		int rank1 = 100;//lower one
 		int rank2 = 100;
 		int numOfSelected = 0;

@@ -145,7 +145,7 @@ public class EditPlayerBox extends JDialog {
 								JOptionPane.showMessageDialog(null, "Please input a name.");
 								return;
 							}
-							if(!playerList.isNameOk(txtName.getText(), selected.getName())) {
+							if(!playerList.isNameOk(txtName.getText(), selected.getRank())) {
 								return;
 							}
 							Frame.editPlayer(selected, txtName.getText(), cbGender.getSelectedIndex() == 0);
