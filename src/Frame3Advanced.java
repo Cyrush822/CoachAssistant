@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.JRadioButton;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -28,6 +30,7 @@ public class Frame3Advanced extends JDialog {
 	private JButton okButton;
 	private SavedSettings settings;
 	private JRadioButton rdbtnShowConfirmDialogue;
+	private JSpinner spinner_TriesMultiplier;
 	/**
 	 * Create the dialog.
 	 * @param savedSettings 
@@ -37,6 +40,7 @@ public class Frame3Advanced extends JDialog {
 		initComponents();
 		createEvents();
 		spinner.setValue(settings.getConfigsSaved());
+		spinner_TriesMultiplier.setModel(new SpinnerNumberModel(settings.getTriesMultiplier(), 0.25, 25, 0.25));
 		rdbtnEnablePartnersSystem.setSelected(settings.isPartnerSystemOn());
 		rdbtnShowConfirmDialogue.setSelected(settings.isConfirmDialogue());
 		
@@ -58,13 +62,14 @@ public class Frame3Advanced extends JDialog {
 				settings.setConfigsSaved((int)spinner.getValue());
 				settings.setPartnerSystemOn(rdbtnEnablePartnersSystem.isSelected());
 				settings.setConfirmDialogue(rdbtnShowConfirmDialogue.isSelected());
+				settings.setTriesMultiplier((float)(double)spinner_TriesMultiplier.getValue());
 				settings.save();
 				setVisible(false);
 			}
 		});
 	}
 	public void initComponents() {
-		setBounds(100, 100, 302, 186);
+		setBounds(100, 100, 302, 221);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -73,7 +78,7 @@ public class Frame3Advanced extends JDialog {
 		
 		spinner = new JSpinner();
 		
-		JLabel lblConfigurations = new JLabel("configurations");
+		JLabel lblConfigurations = new JLabel("generations");
 		
 		rdbtnEnablePartnersSystem = new JRadioButton("Enable Partners System");
 		rdbtnEnablePartnersSystem.addActionListener(new ActionListener() {
@@ -82,6 +87,10 @@ public class Frame3Advanced extends JDialog {
 		});
 		
 		rdbtnShowConfirmDialogue = new JRadioButton("<HTML>\nShow Confirm Dialogue when <br>pressing \"done\"");
+		
+		JLabel lblOfTries = new JLabel("# of tries multiplier:");
+		
+		spinner_TriesMultiplier = new JSpinner();
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -99,8 +108,13 @@ public class Frame3Advanced extends JDialog {
 							.addComponent(rdbtnEnablePartnersSystem))
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(rdbtnShowConfirmDialogue)))
-					.addContainerGap(49, Short.MAX_VALUE))
+							.addComponent(rdbtnShowConfirmDialogue))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblOfTries, GroupLayout.PREFERRED_SIZE, 134, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(spinner_TriesMultiplier, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(63, Short.MAX_VALUE))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -114,7 +128,11 @@ public class Frame3Advanced extends JDialog {
 					.addComponent(rdbtnEnablePartnersSystem)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(rdbtnShowConfirmDialogue)
-					.addContainerGap(7, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblOfTries)
+						.addComponent(spinner_TriesMultiplier, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		contentPanel.setLayout(gl_contentPanel);
 		{

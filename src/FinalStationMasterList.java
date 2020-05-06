@@ -21,7 +21,7 @@ public class FinalStationMasterList implements Serializable{
 	private LocalTime savedTime;
 	private LocalDate savedDate;
 	private MasterPlayerList playerList;
-
+	private SavedSettings settings;
 	private ArrayList<Player> players;// players that are not absent, taken from playerList
 	private ArrayList<Player> availablePlayers;// players that are both not absent and available
 	// (not being used for some station)
@@ -95,13 +95,22 @@ public class FinalStationMasterList implements Serializable{
 		}
 		return finalList;
 	}
+	public int getGenerateStationsMaxAttempts() {
+		return (int)(Math.pow(finalStations.size(), 2) * (int)Math.pow(settings.configsSaved,2) * settings.getTriesMultiplier());
+	}
+	public int getFillStationsToMinMaxAttempts(FinalStation station) {
+		return (int)Math.pow(station.getStation().getMinPlayers(), 3) * settings.configsSaved;
+	}
+	public int getAddRandomCandidateMaxAttempts(ArrayList<Player> candidates) {
+		return (int)Math.pow(candidates.size(), 3);
+	}
 	/*
 	 * The master method to generate stations. Automatically fills every station in 
 	 * finalStations with players according to their configurations.
 	 * However, very random and unoptimized... Will not work if there's too many configs,
 	 * and relies heavily on luck and tons of tries to get one config that fits all 
 	 * required parameters.
-	 * Current Logic:
+	 * Logic:
 	 * 1. Calculate maxAttempts according to finalStations size (larger = higher)
 	 * 2. While attempts below MaxAttempts
 	 * 	a.) Calculate priority for each station and sort
@@ -127,8 +136,9 @@ public class FinalStationMasterList implements Serializable{
 	 * How many paramters, not stations.
 	 */
 	public void generateStations() {
+		settings = this.deserializeSettings(new File(Frame3.settingsFileName));
 		int attempts = 0;
-		int maxAttempts = (int)Math.pow(finalStations.size(), 2);
+		int maxAttempts = this.getGenerateStationsMaxAttempts();
 		while(attempts < maxAttempts) {
 			for(FinalStation station : finalStations) {
 				station.clearPlayers();
@@ -151,7 +161,7 @@ public class FinalStationMasterList implements Serializable{
 						continue;
 					}
 				} else {
-					break;	
+					break;
 				}
 			} else {
 				attempts++;
@@ -160,9 +170,12 @@ public class FinalStationMasterList implements Serializable{
 		}
 		
 		if(this.getAvailablePlayers().size() > 0) {
-			JOptionPane.showMessageDialog(null, "There was an error likely due to too many parameters! "
-					+ "Please try again. If that doesn't work, "
-					+ "try decreasing the number of conditions and parameters!", "error", 0);
+			JOptionPane.showMessageDialog(null, "<HTML>There was an error likely due to too many parameters! <br>"
+					+ "Please try again. If that doesn't work, <br>"
+					+ "try decreasing the number of conditions and parameters!<br>"
+					+ "Also ensure that parameters do not result in impossible situations <br>"
+					+ "(ex. requiring gender differences when there are only males)<br>"
+					+ "Alternatively, increase the # of tries multiplier in advanced settings.", "Error", 0);
 		}
 	}
 	private boolean useUpRemainingCandidates() {
@@ -284,7 +297,7 @@ public class FinalStationMasterList implements Serializable{
 			return true;
 		}
 		int attempts = 0;
-		int maxAttempts = (int)Math.pow(station.getStation().getMinPlayers(), 3);
+		int maxAttempts = this.getFillStationsToMinMaxAttempts(station);
 		while(attempts <  maxAttempts) {
 			if(station.satisfiedMinimum()) {
 				break;
@@ -308,7 +321,8 @@ public class FinalStationMasterList implements Serializable{
 				if(station.satisfiedMinimum()) {
 					break;
 				} else {
-					if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+					System.out.println("partner system: " + settings.getPartnerSystemOn());
+					if(station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles) && settings.getPartnerSystemOn()) {
 						ArrayList<Player> existingPlayers = new ArrayList<Player>();
 						for(Player player : station.getCurrentPlayers()) {
 							existingPlayers.add(player);
@@ -381,13 +395,14 @@ public class FinalStationMasterList implements Serializable{
 		}
 		int index = 99999;
 		int attempts = 0;
-		while(attempts < 50) {
+		int maxAttempts = this.getAddRandomCandidateMaxAttempts(candidates);
+		while(attempts < maxAttempts) {
 			index = (int) (candidates.size() * Math.random());
 			if(!availablePlayers.contains(candidates.get(index))) {
 				attempts++;
 				continue;
 			}
-			if(!station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles)) {
+			if(!station.getStation().getCompType().equals(MasterStationList.competitiveType.doubles) || !settings.getPartnerSystemOn()) {
 				break;
 			}
 			//is doubles
@@ -757,6 +772,7 @@ public class FinalStationMasterList implements Serializable{
             return null;
         } 
 	}
+	
 	public FinalStationMasterList deserializeFinalStationMasterList(File file) {
 		try
         {    

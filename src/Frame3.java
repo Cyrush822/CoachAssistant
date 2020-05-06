@@ -520,7 +520,8 @@ public class Frame3 extends JFrame {
 		JButton btnHelp = new JButton("Help");
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				Frame3Help frame = new Frame3Help();
+				frame.setVisible(true);
 			}
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);

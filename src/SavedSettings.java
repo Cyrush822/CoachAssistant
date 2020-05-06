@@ -6,6 +6,7 @@ import java.io.*;
 public class SavedSettings implements Serializable{
 	
 	int configsSaved = 2;
+	float triesMultiplier = 1;
 	boolean partnerSystemOn = true;
 	boolean confirmDialogue = true;
 	public String fileName = "AdvSettings";
@@ -53,6 +54,9 @@ public class SavedSettings implements Serializable{
 	public void setPartnerSystemOn(boolean partnerSystemOn) {
 		this.partnerSystemOn = partnerSystemOn;
 	}
+	public boolean getPartnerSystemOn() {
+		return this.partnerSystemOn;
+	}
 
 	public boolean isConfirmDialogue() {
 		return confirmDialogue;
@@ -60,5 +64,13 @@ public class SavedSettings implements Serializable{
 
 	public void setConfirmDialogue(boolean confirmDialogue) {
 		this.confirmDialogue = confirmDialogue;
+	}
+
+	public float getTriesMultiplier() {
+		return triesMultiplier;
+	}
+
+	public void setTriesMultiplier(float triesMultiplier) {
+		this.triesMultiplier = triesMultiplier;
 	}
 }
