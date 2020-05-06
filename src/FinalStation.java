@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.awt.*; 
 public class FinalStation implements Serializable{
-	transient public static int randomVar = 50;
+	
 	private Station station;
 	private FinalStationMasterList pastList;
 	private int priority;
@@ -96,8 +96,7 @@ public class FinalStation implements Serializable{
 		} else if(station.getCompType().equals(MasterStationList.competitiveType.singles)) {
 			priority += 10;
 		}
-		int var = (int)(Math.random() * randomVar);
-		this.priority = priority + var;
+		this.priority = priority;
 	}
 	public void printLists() {
 		System.out.println(this.station.getStationName()); 
