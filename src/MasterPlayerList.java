@@ -233,7 +233,9 @@ public class MasterPlayerList implements Serializable{
 				int rank1 = players.get(a).getRank();
 				int rank2 = players.get(a + 1).getRank();
 				if(rank1 > rank2) {
-					swapInList(rank1, rank2);
+					Player holder = players.get(a);
+					players.set(a, players.get(a+1));
+					players.set(a+1, holder);
 				}
 			}
 		}
