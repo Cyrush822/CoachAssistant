@@ -180,13 +180,17 @@ public class FinalStationMasterList implements Serializable{
 					+ "Alternatively, increase the # of tries multiplier in advanced settings.", "Error", 0);
 		}
 	}
-	private boolean useUpRemainingCandidates() {
+	private boolean useUpRemainingCandidates() {//ERROR: candidateList size differs. Must account for each
 		for(int i = 0; i < this.availablePlayers.size(); i++) {//try to fit one where it is preferred
 			int listNumber = 0;
 			boolean success = false;
 			while(listNumber < finalStations.get(0).getCandidateLists().size()) {
 				for(FinalStation station : finalStations) {
-					if(!station.satisfiedPreferredNumberOfPlayers() && station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {
+					System.out.println("listNumber: " + listNumber);
+					System.out.println("candidateList size: " + station.getCandidateLists().size());
+					if(!station.satisfiedPreferredNumberOfPlayers() && 
+						listNumber < station.getCandidateLists().size() &&
+						station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {//index out of bounds error
 						station.addPlayer(this.availablePlayers.get(i));
 						success = true;
 						break;
@@ -204,7 +208,8 @@ public class FinalStationMasterList implements Serializable{
 				success = false;
 				while(listNumber < finalStations.get(0).getCandidateLists().size()) {
 					for(FinalStation station : finalStations) {
-						if(!station.isFull() && station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {
+						if(!station.isFull() && 
+								station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {//index out of bounds error
 							station.addPlayer(this.availablePlayers.get(i));
 							success = true;
 							break;
@@ -362,9 +367,9 @@ public class FinalStationMasterList implements Serializable{
 	 * currently uses bubble sort
 	 */
 	public void reorderStationsByPriority() {
-		for(FinalStation station : finalStations) {
-			station.calculatePriority();
-		}
+//		for(FinalStation station : finalStations) {
+//			station.calculatePriority();
+//		}
 		for(int i = finalStations.size(); i > 0; i--) {
 			for(int a = 0; a < i - 1; a++) {
 				if(finalStations.get(a).getPriority() < finalStations.get(a + 1).getPriority()) {
@@ -797,6 +802,10 @@ public class FinalStationMasterList implements Serializable{
         catch(IOException ex) 
         { 
             System.out.println("IOException is caught"); 
+            System.out.println("Deleting oldConfigs and recentlyDeletedConfigs and all word docs");
+            this.deleteOldConfigs();
+            this.deleteWordDocs();
+            
             return null;
         } 
           
@@ -805,6 +814,26 @@ public class FinalStationMasterList implements Serializable{
             System.out.println("ClassNotFoundException is caught"); 
             return null;
         } 
+	}
+	public void deleteOldConfigs() {
+        File configDir = new File(Frame3.dirName);
+        for(File config : configDir.listFiles()) {
+        	config.delete();
+        }
+        File RDConfigDir = new File(Frame3.rDConfigDirName);
+        for(File config : RDConfigDir.listFiles()) {
+        	config.delete();
+        }
+	}
+	public void deleteWordDocs() {
+		File wordDocDir = new File(Frame3.docDirName);
+		for(File doc : wordDocDir.listFiles()) {
+			doc.delete();
+		}
+		File RDWordDocDir = new File(Frame3.rDWordDirName);
+		for(File doc : RDWordDocDir.listFiles()) {
+			doc.delete();
+		}
 	}
 	public void sortPlayersByRank(ArrayList<Player> players) {
 		for(int i = players.size(); i > 0; i--) {

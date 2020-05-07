@@ -50,9 +50,9 @@ public class Frame3 extends JFrame {
 	private File settingsFile;
 	public static String settingsFileName = "AdvSettings";
 	public static String dirName = "savedConfigs";
-	private final String rDConfigDirName = "recentlyDeletedConfig";
-	private final String rDWordDirName = "recentlyDeletedWordDoc";
-	public String docDirName = "ConvertedDocuments";
+	public static final String rDConfigDirName = "recentlyDeletedConfig";
+	public static final String rDWordDirName = "recentlyDeletedWordDoc";
+	public static String docDirName = "ConvertedDocuments";
 	/**
 	 * 
 	 * Launch the application.

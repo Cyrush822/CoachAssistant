@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.awt.*; 
 public class FinalStation implements Serializable{
+	private static int priorityRandVar = 50;
 	
 	private Station station;
 	private FinalStationMasterList pastList;
@@ -96,6 +97,7 @@ public class FinalStation implements Serializable{
 		} else if(station.getCompType().equals(MasterStationList.competitiveType.singles)) {
 			priority += 10;
 		}
+		priority += (int)(Math.random() * priorityRandVar);
 		this.priority = priority;
 	}
 	public void printLists() {
@@ -162,53 +164,15 @@ public class FinalStation implements Serializable{
 		ArrayList<Player> candidatesForRankPreference = finalStationList.getRankPreferenceList(this);
 		System.out.println("Possible Candidates Fulfilling Rank Preference: " + candidatesForRankPreference);
 		ArrayList<ArrayList<Player>> oldConfigs = finalStationList.getPreviousConfigLists(this);
-		System.out.println("\n---------------------------------------------------------\n");
 		for(int i = 0; i < oldConfigs.size(); i++) {
-			System.out.println(this.station.getStationName() + "oldConfigs(" + i + "): " + oldConfigs.get(i));
+			System.out.println(this.station.getStationName() + "Candidates who did not appear in oldConfig#" + i + ": " + oldConfigs.get(i));
 		}
 		for(int i = 4 + oldConfigs.size() - 1; i >= 0;i--) {
-			
-//			ArrayList<ArrayList<Player>> playerListsToMerge = new ArrayList<ArrayList<Player>>();
-//			playerListsToMerge.add(finalStationList.getAvailablePlayers());
-//			switch(i)  {
-//			case 0:
-//				if(this.station.getGenderPrefImportance() == 1) {
-//					playerListsToMerge.add(candidatesForGenderDifference);
-//				}
-//			case 1:
-//				if(this.station.getRankPreferenceImportance() == 1) {
-//					playerListsToMerge.add(candidatesForRankPreference);
-//				}
-//			case 2:
-//				if(this.station.getGenderPrefImportance() == 2) {
-//					playerListsToMerge.add(candidatesForGenderDifference);
-//				}
-//			case 3:
-//				if(this.station.getRankPreferenceImportance() == 2) {
-//					playerListsToMerge.add(candidatesForRankPreference);
-//				}
-////			case 5:
-////				//add previous save here
-//			case 4: {
-//				if(this.station.isRanked()) {
-//					playerListsToMerge.add(candidatesForRankDifference);
-//				}
-//				if(this.station.getRankPreferenceImportance() == 3) {
-//					playerListsToMerge.add(candidatesForRankPreference);
-//				}
-//				if(this.station.getGenderPrefImportance() == 3) {
-//					playerListsToMerge.add(candidatesForGenderDifference);
-//				}
-//				break;
-//			}
-//			default: {
-//				break
-//			}
-//			}
 			candidateLists.add(getList(i,candidatesForRankDifference, 
 					candidatesForGenderDifference, candidatesForRankPreference,oldConfigs,
 					finalStationList.getAvailablePlayers()));
 		}
+		System.out.println("\n---------------------------------------------------------\n");
 	}
 	public Player getRandomPlayerFromList(ArrayList<Player> playerList) {
 		int num = (int) (Math.random() * playerList.size());
