@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -105,17 +106,28 @@ public class Frame1 {
 	 */
 
 	public void deletePlayer() {
-		PlayerLabel selected = getOneSelectedPlayerLabel();
-		if(selected == null) {
+		ArrayList<PlayerLabel> selectedLabels = new ArrayList<PlayerLabel>();
+		for(PlayerLabel PL : labelList.getPlayerLabelList()) {
+			if(PL.getIsSelected()) {
+				selectedLabels.add(PL);
+			}
+		}
+		if(selectedLabels.size() == 0) {
 			return;
 		}
-		int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this/these players? "
+		int option = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the selected player(s)? "
 				+ "If he has a partner, it will be unassigned and his average ranking will"
 				+ "be gone forever!");
 		if(option != 0) {
 			return;
 		}
-		playerList.deletePlayer(selected.rank);
+		int option2 = JOptionPane.showConfirmDialog(null, "Are ABSOLUTELY sure?");
+		if(option2 != 0) {
+			return;
+		}
+		for(PlayerLabel label : selectedLabels) {
+			playerList.deletePlayer(label.getPlayer().getRank());
+		}
 		updatePlayerLabels();
 	}
 	public void updatePlayerLabels() {

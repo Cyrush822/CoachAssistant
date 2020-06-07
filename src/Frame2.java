@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 public class Frame2 extends JFrame {
@@ -106,6 +107,7 @@ public class Frame2 extends JFrame {
 				return values.get(index);
 			}
 		});
+		JlistStations.setCellRenderer(new MyListCellRenderer(stationList));
 		updateAvailableAndRequiredPlayersLabels();
 	}
 	public void createEvents() {
@@ -369,11 +371,11 @@ public class Frame2 extends JFrame {
 								.addComponent(btnDeleteStation, GroupLayout.PREFERRED_SIZE, 117, Short.MAX_VALUE)
 								.addComponent(btnTemp, GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
 							.addGap(15)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_contentPane.createSequentialGroup()
 									.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
 									.addContainerGap())
-								.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+								.addGroup(gl_contentPane.createSequentialGroup()
 									.addPreferredGap(ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
 									.addComponent(lblNumberOfPresent)
 									.addPreferredGap(ComponentPlacement.RELATED)

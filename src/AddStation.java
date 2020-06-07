@@ -212,20 +212,7 @@ public class AddStation extends JDialog {
 					}
 				}
 				else {
-					checkBoxComp.setSelected(chckbxRequireEven.isSelected());
-//					boolean flag = checkBoxComp.isSelected();
-//					spinnerMin.setVisible(!flag);
-//					spinnerPref.setVisible(!flag);
-//					spinnerMax.setVisible(!flag);
-//					rdbtnDoubles.setVisible(flag);
-//					rdbtnSingles.setVisible(flag);
-//					lblMinimumNumberOf.setVisible(!flag);
-//					lblPreferredNumberOf.setVisible(!flag);
-//					lblMaximumNumberOf.setVisible(!flag);
-//					if(flag) {
-//						setAllPlayerSpinners(2);
-//						rdbtnSingles.setSelected(true);
-					
+					//checkBoxComp.setSelected(chckbxRequireEven.isSelected());
 				}
 				updateAllUIVisibilities();
 			}
@@ -298,6 +285,9 @@ public class AddStation extends JDialog {
 		} else {
 			lblRankPref.setText(" Players of any rank.");
 		}
+	}
+	boolean checkEvens() {
+		return true;
 	}
 	/**
 	 * checks that all values are good, and then creates a new Station and calls addStation

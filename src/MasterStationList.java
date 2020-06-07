@@ -49,6 +49,14 @@ public class MasterStationList implements Serializable{
 		notCompetitive, singles, doubles;
 	}
 	
+	private final transient static String[] colors = {
+			"blue",
+			"green",
+			"purple",
+			"orange",
+	};
+	
+	private transient ArrayList<String> coloredStationTags = new ArrayList<String>();
 	
 	public MasterStationList(File directory) {
 		if(!directory.exists()) {
@@ -228,6 +236,29 @@ public class MasterStationList implements Serializable{
 	public void addStation(Station newStation, int index) {
 		// TODO Auto-generated method stub
 		stations.add(index, newStation);
-		
+	}
+	
+	public boolean isTagDuplicate(Station station) {
+		String tag = station.getStationDesc();
+		for(Station otherStation : stations) {
+			if(!otherStation.equals(station) && otherStation.getStationDesc().equals(tag)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public String getNewTagColor(Station station) {
+		String tag = station.getStationDesc();
+		if(coloredStationTags.contains(tag)) {
+			int index = coloredStationTags.indexOf(tag);
+			return colors[index];
+		}
+		coloredStationTags.add(tag);
+		if(coloredStationTags.size() - 1 < colors.length) {
+			return colors[coloredStationTags.size() - 1];
+		} else {
+			return Color.getHSBColor((int)Math.random() * 360, 100, 100).toString();
+		}
 	}
 }

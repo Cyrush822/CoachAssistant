@@ -132,24 +132,6 @@ public class Station implements Serializable {
 	}
 	public String toString() {
 		String str = "";
-//		str += String.format("Name: %-20s | Desc: %-25s ", stationName, stationDescription);
-//		String compStr = "";
-//		if(compType == MasterStationList.competitiveType.notCompetitive) {
-//			compStr = String.format("| min: %-3d pref: "
-//					+ "%-3d max: %-3d ", minPlayers, preferredPlayers, maxPlayers);
-//		} else {
-//			if(compType == MasterStationList.competitiveType.singles) {
-//				compStr = String.format("| Singles ");
-//			} else {
-//				compStr = String.format("| Doubles ");
-//			}
-//		}
-//		str += String.format("%-20s | ", compStr);
-//		String rankText = "";
-//		if(isRanked) {
-//			rankText = String.format("Ranked. Max Rank Difference: %-2d", maxRankDifference); 
-//		}
-//		str += String.format("%-25s", rankText);
 		str += this.stationName + " ";
 		if(isDisabled) {
 			str += "- DISABLED";	

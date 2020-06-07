@@ -186,8 +186,6 @@ public class FinalStationMasterList implements Serializable{
 			boolean success = false;
 			while(listNumber < finalStations.get(0).getCandidateLists().size()) {
 				for(FinalStation station : finalStations) {
-					System.out.println("listNumber: " + listNumber);
-					System.out.println("candidateList size: " + station.getCandidateLists().size());
 					if(!station.satisfiedPreferredNumberOfPlayers() && 
 						listNumber < station.getCandidateLists().size() &&
 						station.getCandidateLists().get(listNumber).contains(this.availablePlayers.get(i))) {//index out of bounds error
