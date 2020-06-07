@@ -253,7 +253,7 @@ public class Frame2 extends JFrame {
 	public void goBack() {
 		this.setVisible(false);
 			try {
-				Frame1 window = new Frame1();
+				CoachAssistant window = new CoachAssistant();
 				window.getFrmCissTableTennis().setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();

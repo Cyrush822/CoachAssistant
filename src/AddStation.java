@@ -43,9 +43,7 @@ public class AddStation extends JDialog {
 	private JSpinner spinnerMax;
 	private JButton okButton;
 	private JTextField txtName;
-	private JSpinner spinnerTables;
 	private JTextField txtDesc;
-	private JCheckBox chckbxRequireEven;
 	private JComboBox<MasterStationList.genderPreference> comboBoxGenderPref;
 	private Frame2 frame;
 	private JLabel lblMin;
@@ -55,15 +53,13 @@ public class AddStation extends JDialog {
 	private final int nameMaxChars = 15;
 	private final int descMaxChars = 20;
 	private Station exception;
-	private JRadioButton rdbtnDoubles;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
-	private JRadioButton rdbtnSingles;
-	private JCheckBox checkBoxComp;
 	private JLabel lblMinimumNumberOf;
 	private JLabel lblPreferredNumberOf;
 	private JLabel lblMaximumNumberOf;
 	private JLabel lblRankPref;
 	private JButton btnHelp;
+	private JRadioButton rdbtnDoubles;
 	public enum rankingPref {
 	};
 	/**
@@ -103,21 +99,9 @@ public class AddStation extends JDialog {
 		spinnerRankDifference.setValue(exception.getMaxRankDifference());
 		comboBoxRankPref.setSelectedItem(exception.getRankPref());
 		comboBoxGenderPref.setSelectedItem(exception.getGenderPref());
-		spinnerTables.setValue(exception.getNumberOfTables());
-		chckbxRequireEven.setSelected(exception.isMustBeEven());
-		if(exception.getCompType().equals(MasterStationList.competitiveType.notCompetitive)) {
-			checkBoxComp.setSelected(false);
-		} else {
-			checkBoxComp.setSelected(true);
-			if(exception.getCompType() == MasterStationList.competitiveType.singles) {
-				rdbtnSingles.setSelected(true);
-			} else {
-				rdbtnSingles.setSelected(false);
-				rdbtnDoubles.setSelected(true);
-			}
-		}
 		spinnerRankMin.setValue(exception.getRankMin());
 		spinnerRankMax.setValue(exception.getRankMax());
+		rdbtnDoubles.setSelected(exception.getCompType().equals(MasterStationList.competitiveType.doubles));
 		setTitle("Edit Existing Station - " + exception.getStationName());
 		updateAllUIVisibilities();
 	}
@@ -197,69 +181,8 @@ public class AddStation extends JDialog {
 				}
 			}
 		});
-		chckbxRequireEven.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-//				checkBoxComp.setVisible(chckbxRequireEven.isSelected());
-				if(chckbxRequireEven.isSelected()) {
-					if((int)spinnerMin.getValue() % 2 != 0) {
-						spinnerMin.setValue((int)spinnerMin.getValue() + 1);
-					}
-					if((int)spinnerMax.getValue() % 2 != 0) {
-						spinnerMax.setValue((int)spinnerMax.getValue() + 1);
-					}
-					if((int)spinnerPref.getValue() % 2 != 0) {
-						spinnerPref.setValue((int)spinnerPref.getValue() + 1);
-					}
-				}
-				else {
-					//checkBoxComp.setSelected(chckbxRequireEven.isSelected());
-				}
-				updateAllUIVisibilities();
-			}
-			
-		});
-		checkBoxComp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updateAllUIVisibilities();
-//				boolean flag = checkBoxComp.isSelected();
-//				spinnerMin.setVisible(!flag);
-//				spinnerPref.setVisible(!flag);
-//				spinnerMax.setVisible(!flag);
-//				rdbtnDoubles.setVisible(flag);
-//				rdbtnSingles.setVisible(flag);
-//				lblMinimumNumberOf.setVisible(!flag);
-//				lblPreferredNumberOf.setVisible(!flag);
-//				lblMaximumNumberOf.setVisible(!flag);
-				boolean flag = checkBoxComp.isSelected();
-				if(flag) {
-					setAllPlayerSpinners(2);
-					rdbtnSingles.setSelected(true);
-				}
-
-			}
-		});
-		rdbtnDoubles.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setAllPlayerSpinners(4);
-			}
-		});
-		rdbtnSingles.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setAllPlayerSpinners(2);
-			}
-		});
 	}
 	private void updateAllUIVisibilities() {
-		checkBoxComp.setVisible(chckbxRequireEven.isSelected());
-		boolean flag = checkBoxComp.isSelected();
-		spinnerMin.setVisible(!flag);
-		spinnerPref.setVisible(!flag);
-		spinnerMax.setVisible(!flag);
-		rdbtnDoubles.setVisible(flag);
-		rdbtnSingles.setVisible(flag);
-		lblMinimumNumberOf.setVisible(!flag);
-		lblPreferredNumberOf.setVisible(!flag);
-		lblMaximumNumberOf.setVisible(!flag);
 		updateRankPrefUI();
 		lblMaximumRankDifference.setVisible(chckbxTakeRanksInto.isSelected());
 		spinnerRankDifference.setVisible(chckbxTakeRanksInto.isSelected());
@@ -308,33 +231,25 @@ public class AddStation extends JDialog {
 			return;
 		}if(!checkRankRequirements()) {
 			return;
-		}if((int)spinnerTables.getValue() < 0) {
-			JOptionPane.showMessageDialog(null, "please ensure the number of tables "
-					+ "required is not less than 0");
-			return;
 		}
 		int maxRank = (int)this.spinnerRankDifference.getValue();
 		if(!chckbxTakeRanksInto.isSelected()) {
 			maxRank = 0;
 		}
 		MasterStationList.competitiveType compType;
-		if(!checkBoxComp.isSelected()) {
-			compType = MasterStationList.competitiveType.notCompetitive;
+		if(rdbtnDoubles.isSelected()) {
+			compType = MasterStationList.competitiveType.doubles;
 		} else {
-			if(rdbtnSingles.isSelected()) {
-				compType = MasterStationList.competitiveType.singles;
-			} else {
-				compType = MasterStationList.competitiveType.doubles;
-			}
+			compType = MasterStationList.competitiveType.notCompetitive;
 		}
 		Station newStation = new Station(txtName.getText(), txtDesc.getText(), 
 				(int)spinnerMin.getValue(), (int)spinnerMax.getValue(), 
-				(int)spinnerPref.getValue(), chckbxRequireEven.isSelected(), 
+				(int)spinnerPref.getValue(), rdbtnDoubles.isSelected(), 
 				chckbxTakeRanksInto.isSelected(), (int)spinnerRankDifference.getValue(),
 				(MasterStationList.genderPreference) comboBoxGenderPref.getSelectedItem(), 
 				(MasterStationList.rankPreference) comboBoxRankPref.getSelectedItem(),
 				(int)spinnerRankMin.getValue(), (int)spinnerRankMax.getValue(),
-				(int)spinnerTables.getValue(), compType);
+				0, compType);
 		if(exception != null) {
 			frame.editStation(exception, newStation);
 		} else {
@@ -402,23 +317,6 @@ public class AddStation extends JDialog {
 					+ "maximum players is not less than 1!");
 			return false;
 		}
-		if(chckbxRequireEven.isSelected()) {
-			if((int)spinnerMin.getValue() % 2 != 0) {
-				JOptionPane.showMessageDialog(null, "Please make sure the minimum number"
-						+ " of players is even!");
-				return false;
-			}
-			if((int)spinnerMax.getValue() % 2 != 0) {
-				JOptionPane.showMessageDialog(null, "Please make sure the maximum number"
-						+ " of players is even!");
-				return false;
-			}
-			if((int)spinnerPref.getValue() % 2 != 0) {
-				JOptionPane.showMessageDialog(null, "Please make sure the preferred number"
-						+ " of players is even!");
-				return false;
-			}
-		}
 		return true;
 	}
 	void initComponents() {
@@ -443,9 +341,6 @@ public class AddStation extends JDialog {
 		
 		txtDesc = new JTextField("");
 		txtDesc.setColumns(10);
-		
-		chckbxRequireEven = new JCheckBox("Must be even");
-		chckbxRequireEven.setToolTipText("<HTML>\nShould the number of players at this station be even?\n");
 		
 		chckbxTakeRanksInto = new JCheckBox("Take ranks into account");
 		chckbxTakeRanksInto.setToolTipText("<HTML>\nShould the station take ranks into account?\nUsually marked true for ranked matches. If not marked, will disregard rank\n");
@@ -482,11 +377,6 @@ public class AddStation extends JDialog {
 		spinnerRankMin.setValue(1);
 		spinnerRankMax = new JSpinner();
 		spinnerRankMax.setValue(1);
-		JLabel lblTablesRequired = new JLabel("Tables required:");
-		lblTablesRequired.setToolTipText("number of tables required just for reference\n");
-		
-		spinnerTables = new JSpinner();
-		spinnerTables.setValue(1);
 		lblMin = new JLabel("Min\n");
 		lblMin.setHorizontalAlignment(SwingConstants.CENTER);
 		
@@ -495,91 +385,70 @@ public class AddStation extends JDialog {
 		
 		lblDash = new JLabel("-");
 		
-		checkBoxComp = new JCheckBox("Competitive match");
-		
-		checkBoxComp.setVisible(false);
-		checkBoxComp.setToolTipText("<HTML>\nShould the number of players at this station be even?\n");
-		
-		rdbtnSingles = new JRadioButton("Singles");
-
-		rdbtnSingles.setSelected(true);
-		buttonGroup.add(rdbtnSingles);
-		rdbtnSingles.setVisible(false);
-		
-		rdbtnDoubles = new JRadioButton("Doubles");
-
-		rdbtnDoubles.setSelected(true);
-		rdbtnDoubles.setVisible(false);
-		buttonGroup.add(rdbtnDoubles);
+		rdbtnDoubles = new JRadioButton("Partners System");
 		
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblStationName)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(txtName, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(lblStationDescription)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(txtDesc, GroupLayout.PREFERRED_SIZE, 234, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblMinimumNumberOf)
-										.addComponent(lblPreferredNumberOf)
-										.addComponent(lblMaximumNumberOf))
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING, false)
-										.addComponent(spinnerMin, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-										.addComponent(spinnerPref)
-										.addComponent(spinnerMax))
-									.addGap(35)
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(checkBoxComp)
-										.addGroup(gl_contentPanel.createSequentialGroup()
-											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(rdbtnSingles)
-											.addPreferredGap(ComponentPlacement.UNRELATED)
-											.addComponent(rdbtnDoubles))
-										.addComponent(chckbxRequireEven, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(chckbxTakeRanksInto)
-									.addGap(14)
-									.addComponent(lblMaximumRankDifference)
-									.addGap(10)
-									.addComponent(spinnerRankDifference, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(comboBoxRankPref, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(comboBoxGenderPref, Alignment.LEADING, 0, 127, Short.MAX_VALUE))
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblNewLabel)
-										.addGroup(gl_contentPanel.createSequentialGroup()
-											.addComponent(lblRankPref, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
-											.addPreferredGap(ComponentPlacement.RELATED)
-											.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-												.addComponent(spinnerRankMin, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
-												.addGroup(gl_contentPanel.createSequentialGroup()
-													.addGap(6)
-													.addComponent(lblMin)
-													.addPreferredGap(ComponentPlacement.UNRELATED)
-													.addComponent(lblDash)))
-											.addPreferredGap(ComponentPlacement.RELATED)
-											.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING, false)
-												.addComponent(lblMax, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(spinnerRankMax, GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)))))))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(lblTablesRequired)
+							.addComponent(lblStationName)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(spinnerTables, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(7, Short.MAX_VALUE))
+							.addComponent(txtName, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addComponent(lblStationDescription)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(txtDesc, GroupLayout.PREFERRED_SIZE, 234, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPanel.createSequentialGroup()
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(comboBoxRankPref, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(comboBoxGenderPref, Alignment.LEADING, 0, 127, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel)
+								.addGroup(gl_contentPanel.createSequentialGroup()
+									.addComponent(lblRankPref, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+										.addComponent(spinnerRankMin, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+										.addGroup(gl_contentPanel.createSequentialGroup()
+											.addGap(6)
+											.addComponent(lblMin)
+											.addPreferredGap(ComponentPlacement.UNRELATED)
+											.addComponent(lblDash)))
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(lblMax, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(spinnerRankMax, GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)))))
+						.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING, false)
+							.addGroup(gl_contentPanel.createSequentialGroup()
+								.addGap(6)
+								.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_contentPanel.createSequentialGroup()
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+											.addComponent(lblMinimumNumberOf)
+											.addComponent(lblPreferredNumberOf))
+										.addGap(15)
+										.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+											.addComponent(spinnerMin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGroup(gl_contentPanel.createSequentialGroup()
+												.addComponent(spinnerPref, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+												.addComponent(rdbtnDoubles))))
+									.addGroup(gl_contentPanel.createSequentialGroup()
+										.addComponent(lblMaximumNumberOf)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(spinnerMax, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+								.addPreferredGap(ComponentPlacement.RELATED))
+							.addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
+								.addComponent(chckbxTakeRanksInto)
+								.addGap(14)
+								.addComponent(lblMaximumRankDifference)
+								.addGap(10)
+								.addComponent(spinnerRankDifference, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(39, Short.MAX_VALUE))
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -592,34 +461,24 @@ public class AddStation extends JDialog {
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblStationDescription)
 						.addComponent(txtDesc, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING, false)
+					.addGap(9)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(rdbtnDoubles)
+							.addGap(40))
+						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblMinimumNumberOf)
 								.addComponent(spinnerMin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblPreferredNumberOf)
-								.addComponent(spinnerPref, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(6)
-							.addComponent(chckbxRequireEven)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(checkBoxComp)
-							.addGap(2)))
-					.addPreferredGap(ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
+								.addComponent(spinnerPref, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(7)
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblMaximumNumberOf)
 								.addComponent(spinnerMax, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(rdbtnSingles)
-								.addComponent(rdbtnDoubles))
-							.addGap(6)))
+							.addPreferredGap(ComponentPlacement.RELATED)))
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -645,19 +504,12 @@ public class AddStation extends JDialog {
 							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(spinnerRankMin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(spinnerRankMax, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGap(12)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblTablesRequired)
-								.addComponent(spinnerTables, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblMin)
-								.addComponent(lblDash)
-								.addComponent(lblMax))))
-					.addContainerGap(10, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMin)
+						.addComponent(lblDash)
+						.addComponent(lblMax))
+					.addContainerGap(27, Short.MAX_VALUE))
 		);
 		contentPanel.setLayout(gl_contentPanel);
 		{

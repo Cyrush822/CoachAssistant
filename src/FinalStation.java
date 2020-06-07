@@ -93,9 +93,7 @@ public class FinalStation implements Serializable{
 			priority += Math.pow(MasterPlayerList.playerNumber - rankRange/2, 2);
 		}
 		if(station.getCompType().equals(MasterStationList.competitiveType.doubles)) {
-			priority += 20;
-		} else if(station.getCompType().equals(MasterStationList.competitiveType.singles)) {
-			priority += 10;
+			priority += 60;
 		}
 		priority += (int)(Math.random() * priorityRandVar);
 		this.priority = priority;

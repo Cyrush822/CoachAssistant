@@ -29,7 +29,7 @@ public class EditPlayerBox extends JDialog {
 	private JComboBox cbGender;
 	private MasterPlayerList playerList;
 	private Player selected;
-	Frame1 Frame;
+	CoachAssistant Frame;
 	enum gender
 	{
 		male, female;
@@ -47,7 +47,7 @@ public class EditPlayerBox extends JDialog {
 //	} catch (Exception e) {
 //		e.printStackTrace();
 //	}
-	public EditPlayerBox(MasterPlayerList playerList, Player selected, Frame1 F1) {
+	public EditPlayerBox(MasterPlayerList playerList, Player selected, CoachAssistant F1) {
 		this.playerList = playerList;
 		Frame = F1;
 		this.selected = selected;

@@ -36,7 +36,7 @@ public class AddPlayerBox extends JDialog {
 	private JTextField textField;
 	private JButton okButton;
 	MasterPlayerList playerList;
-	Frame1 parent;
+	CoachAssistant parent;
 	enum genders
 	{
 		male, female;
@@ -48,14 +48,14 @@ public class AddPlayerBox extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public AddPlayerBox(MasterPlayerList playerList, Frame1 aparent) {
+	public AddPlayerBox(MasterPlayerList playerList, CoachAssistant aparent) {
 		this.playerList = playerList;
 		parent = aparent;
 		setModal(true);
 		initComponents();
 		createEvents();
 	}
-	public void setParent(Frame1 F) {
+	public void setParent(CoachAssistant F) {
 		parent = F;
 	}
 	void initComponents() {
