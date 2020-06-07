@@ -23,7 +23,7 @@ public class DeletePlayerBox extends JDialog {
 	private MasterPlayerList playerList;
 	private JTextField txtIndex;
 	private JButton btnOK;
-	CoachAssistant Frame;
+	Frame1 Frame;
 	enum gender
 	{
 		male, female;
@@ -41,7 +41,7 @@ public class DeletePlayerBox extends JDialog {
 //	} catch (Exception e) {
 //		e.printStackTrace();
 //	}
-	public DeletePlayerBox(MasterPlayerList playerList, CoachAssistant F1) {
+	public DeletePlayerBox(MasterPlayerList playerList, Frame1 F1) {
 		this.playerList = playerList;
 		Frame = F1;
 		setTitle("Delete Player");

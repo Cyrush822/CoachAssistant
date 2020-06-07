@@ -62,7 +62,6 @@ public class Frame3 extends JFrame {
 	 * Create the frame.
 	 */
 	public Frame3(MasterPlayerList playerList, MasterStationList stationList) {
-		setTitle("Generate Stations");
 		initComponents();
 		createEvents();
 		settingsFile = new File(settingsFileName);

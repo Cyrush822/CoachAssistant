@@ -20,7 +20,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-public class CoachAssistant {
+public class Frame1 {
 
 	private JFrame frmCissTableTennis;
 	private JLabel FinalNum;
@@ -49,9 +49,8 @@ public class CoachAssistant {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					CoachAssistant window = new CoachAssistant();
+					Frame1 window = new Frame1();
 					window.getFrmCissTableTennis().setVisible(true);
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -61,11 +60,14 @@ public class CoachAssistant {
 	/**
 	 * Create the application.
 	 */
-	public CoachAssistant() {
+	public Frame1() {
 		initComponents();
 		createEvents();
 		assignLists();
 		recreatePartnerConnections();
+		for(int i = 0; i < 5; i++) {
+			System.out.println(playerList.generatePlayerID());
+		}
 	}
 	/**
 	 * initializes playerList and labelList. 
@@ -137,8 +139,7 @@ public class CoachAssistant {
 	private void initComponents()
 	{
 		setFrmCissTableTennis(new JFrame());
-		getFrmCissTableTennis().setTitle("Players");
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "AppName");
+		getFrmCissTableTennis().setTitle("CISS Table Tennis Stations Generator");
 		getFrmCissTableTennis().setBounds(100, 100, 400, 425);
 		getFrmCissTableTennis().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -159,7 +160,7 @@ public class CoachAssistant {
 
 		btnSwap = new JButton("Swap");
 
-		btnWon = new JButton("Insert");
+		btnWon = new JButton("Beat");
 
 
 		btnAbsent = new JButton("Absent");
